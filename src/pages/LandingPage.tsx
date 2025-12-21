@@ -2,12 +2,12 @@ import React, { useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shield, Scan, Lock, Users, Activity, EyeOff, Binary, CheckCircle } from 'lucide-react';
-import Magnetic from './Magnetic';
+import Magnetic from '../components/ui/Magnetic';
 import { SECTIONS, NAV_LINKS } from '../constants';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const UIOverlay: React.FC = () => {
+const LandingPage: React.FC = () => {
 
   useEffect(() => {
     SECTIONS.forEach((section) => {
@@ -260,4 +260,4 @@ const UIOverlay: React.FC = () => {
   );
 };
 
-export default UIOverlay;
+export default LandingPage;

@@ -1,10 +1,10 @@
 import React, { Suspense } from 'react';
 import { Canvas } from '@react-three/fiber';
 import { AdaptiveDpr } from '@react-three/drei';
-import Scene from './components/Scene';
-import UIOverlay from './components/UIOverlay';
-import Cursor from './components/Cursor';
-import Preloader from './components/Preloader';
+import Scene from './components/3d/Scene';
+import LandingPage from './pages/LandingPage';
+import Cursor from './components/ui/Cursor';
+import Preloader from './components/ui/Preloader';
 
 const App: React.FC = () => {
   return (
@@ -33,7 +33,7 @@ const App: React.FC = () => {
       <Preloader />
 
       {/* HTML Content */}
-      <UIOverlay />
+      <LandingPage />
     </>
   );
 };
