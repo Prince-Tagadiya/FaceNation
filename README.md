@@ -1,20 +1,51 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# FaceNation | Identity Architecture
 
-# Run and deploy your AI Studio app
+An immersive, high-performance web experience designed for identity compliance and biometric verification systems. This project leverages advanced 3D rendering and smooth animations to create a futuristic user interface.
 
-This contains everything you need to run your app locally.
+## 🚀 Technologies
 
-View your app in AI Studio: https://ai.studio/apps/drive/13Jh-a8FCyJIm5OvVMtygRvo0JmqYwAV-
+*   **Core**: React 19, TypeScript
+*   **Build Tool**: Vite
+*   **Styling**: Tailwind CSS
+*   **Animations**: GSAP (ScrollTrigger), Framer Motion
+*   **3D Graphics**: Three.js, React Three Fiber, Drei
 
-## Run Locally
+## 🛠️ Installation & Setup
 
-**Prerequisites:**  Node.js
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/Prince-Tagadiya/FaceNation.git
+    cd FaceNation
+    ```
 
+2.  **Install Dependencies**
+    ```bash
+    npm install
+    ```
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+3.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
+    The application will launch at `http://localhost:3000`.
+
+## 📁 Project Structure
+
+This project follows a scalable architecture:
+
+```
+src/
+├── components/
+│   ├── 3d/        # Three.js scenes and particle systems
+│   └── ui/        # Reusable UI elements (Cursor, Magnetic, etc.)
+├── pages/         # Application pages (e.g., LandingPage)
+├── lib/           # Configuration and utilities (Firebase ready)
+└── App.tsx        # Main application entry
+```
+
+## 📦 Deployment
+
+To deploy to Vercel:
+```bash
+npx vercel
+```
