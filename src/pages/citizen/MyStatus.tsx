@@ -23,10 +23,10 @@ const MyStatus: React.FC = () => {
         if (!user) return;
 
         const db = getFirestore(app);
-        // Query cases where subjectId matches the logged-in user's UID
+        // Query cases where subjectName matches the logged-in user's Name
         const q = query(
             collection(db, 'cases'),
-            where('subjectId', '==', user.uid)
+            where('subjectName', '==', user.name)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
