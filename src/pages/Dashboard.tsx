@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { useAuth, UserRole } from '../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
+import { UserRole } from '../types';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
 import { app } from '../lib/firebase';

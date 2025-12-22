@@ -155,7 +155,7 @@ const MorphingParticles = () => {
     tl.to(morphTarget.current, { value: 3, ease: "sine.inOut", duration: 1 }, 5);
     tl.to(morphTarget.current, { value: 4, ease: "power4.inOut", duration: 1 }, 6.5);
 
-    return () => tl.kill();
+    return () => { tl.kill(); };
   }, []);
 
   useFrame((state) => {
