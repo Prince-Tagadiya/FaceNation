@@ -64,13 +64,7 @@ const LandingPage: React.FC = () => {
       }
     });
 
-    gsap.from(".nav-reveal", {
-        y: -80,
-        opacity: 0,
-        duration: 1.2,
-        delay: 0.8,
-        ease: "expo.out"
-    });
+
 
   }, []);
 
@@ -91,7 +85,7 @@ const LandingPage: React.FC = () => {
       </div>
 
       {/* Main Nav */}
-      <nav className="fixed top-10 left-0 w-full px-8 py-4 flex justify-between items-center z-50 text-white pointer-events-none nav-reveal">
+      <nav className="fixed top-10 left-0 w-full px-8 py-4 flex justify-between items-center z-50 text-white">
         <Magnetic>
           <div className="text-xl md:text-2xl font-bold tracking-tighter cursor-pointer flex items-center gap-2 pointer-events-auto group">
             <div className="relative">
@@ -109,6 +103,11 @@ const LandingPage: React.FC = () => {
               </a>
             </Magnetic>
           ))}
+          <Magnetic>
+             <a href="/login" className="text-[9px] font-mono uppercase tracking-[0.2em] text-primary hover:text-white transition-all duration-300 ml-4 border-l border-white/10 pl-4">
+               LOGIN_ACCESS
+             </a>
+          </Magnetic>
         </div>
       </nav>
 
