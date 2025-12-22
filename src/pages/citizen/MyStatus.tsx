@@ -1,7 +1,46 @@
-import React, { useState } from 'react';
-import { Activity, Bell, CheckCircle, AlertTriangle, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Activity, Bell, CheckCircle, AlertTriangle, Clock, AlertCircle } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { getFirestore, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { app } from '../../lib/firebase';
+
+interface CaseData {
+    id: string;
+    caseNumber: string;
+    caseType: string;
+    status: string;
+    description: string;
+    subjectName: string;
+    createdAt: any;
+}
 
 const MyStatus: React.FC = () => {
+    const { user } = useAuth();
+    const [cases, setCases] = useState<CaseData[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const db = getFirestore(app);
+        // Query cases where subjectId matches the logged-in user's UID
+        const q = query(
+            collection(db, 'cases'),
+            where('subjectId', '==', user.uid)
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            const fetchedCases: CaseData[] = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as CaseData[];
+            setCases(fetchedCases);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
+
     // Mock data for memos
     const memos = [
         {
@@ -18,14 +57,6 @@ const MyStatus: React.FC = () => {
             content: "Your recent identity verification request has been vetted and approved by Officer ID #8822.",
             date: "2024-12-20",
             type: "success",
-            read: true
-        },
-        {
-            id: 3,
-            title: "Privacy Policy Amendment",
-            content: "New clauses added regarding bio-metric data retention. Please review the updated handbook.",
-            date: "2024-12-18",
-            type: "warning",
             read: true
         }
     ];
@@ -50,20 +81,67 @@ const MyStatus: React.FC = () => {
                 </div>
                 <h2 className="text-sm uppercase text-gray-500 font-mono tracking-widest mb-4">Active Investigation Status</h2>
 
-                <div className="flex items-center gap-6">
-                    <div className="w-16 h-16 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center animate-pulse">
-                        <CheckCircle size={32} className="text-green-500" />
+                {loading ? (
+                    <div className="flex items-center gap-4 animate-pulse">
+                        <div className="w-16 h-16 rounded-full bg-white/10"></div>
+                        <div className="space-y-2">
+                            <div className="h-4 w-48 bg-white/10 rounded"></div>
+                            <div className="h-3 w-64 bg-white/10 rounded"></div>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-2xl font-bold text-white">No Active Cases</h3>
-                        <p className="text-gray-400 text-sm max-w-lg mt-1">
-                            Your record is currently clear. No ongoing surveillance orders or judicial inquiries are linked to your identity profile.
-                        </p>
+                ) : cases.length === 0 ? (
+                    <div className="flex items-center gap-6">
+                        <div className="w-16 h-16 rounded-full bg-green-500/10 border-2 border-green-500/30 flex items-center justify-center">
+                            <CheckCircle size={32} className="text-green-500" />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-bold text-white">No Active Cases</h3>
+                            <p className="text-gray-400 text-sm max-w-lg mt-1">
+                                Your record is currently clear. No ongoing surveillance orders or judicial inquiries are linked to your identity profile.
+                            </p>
+                        </div>
                     </div>
-                </div>
+                ) : (
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-6 mb-6">
+                            <div className="w-16 h-16 rounded-full bg-red-500/10 border-2 border-red-500/30 flex items-center justify-center animate-pulse">
+                                <AlertCircle size={32} className="text-red-500" />
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-white text-red-400">Active Investigation Detected</h3>
+                                <p className="text-gray-400 text-sm max-w-lg mt-1">
+                                    The following case files are linked to your identity. Please review them.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3">
+                            {cases.map((c) => (
+                                <div key={c.id} className="p-4 bg-black/20 border border-red-500/20 rounded-lg flex flex-col md:flex-row gap-4">
+                                    <div className="min-w-[120px]">
+                                        <p className="text-[10px] uppercase text-gray-500 font-mono tracking-widest">Case Number</p>
+                                        <p className="text-white font-mono font-bold">{c.caseNumber}</p>
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] uppercase text-gray-500 font-mono tracking-widest">Description</p>
+                                        <p className="text-gray-300 text-sm">{c.description}</p>
+                                    </div>
+                                    <div className="min-w-[100px] text-right">
+                                        <span className="inline-block px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded border border-red-500/20 uppercase tracking-wider font-bold">
+                                            {c.status}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
             </div>
 
             <div className="space-y-4">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                    <Bell className="text-primary" size={20} /> System Memos
+                </h2>
                 {memos.map((memo) => (
                     <div key={memo.id} className={`bg-white/5 border ${memo.read ? 'border-white/5 opacity-70 hover:opacity-100' : 'border-primary/30 bg-primary/5'} rounded-xl p-6 transition-all`}>
                         <div className="flex items-start gap-4">

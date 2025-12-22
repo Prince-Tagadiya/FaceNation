@@ -1,20 +1,45 @@
 import React, { useState } from 'react';
 import { Send, AlertCircle } from 'lucide-react';
+import { getFirestore, collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { useAuth } from '../../context/AuthContext';
+import { app } from '../../lib/firebase';
 
 const Requests: React.FC = () => {
+    const { user } = useAuth();
     const [formData, setFormData] = useState({
         category: 'Clarification',
         subject: '',
         description: ''
     });
     const [submitted, setSubmitted] = useState(false);
+    const [loading, setLoading] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate submission
-        setTimeout(() => {
+        if (!user) return;
+
+        setLoading(true);
+        try {
+            const db = getFirestore(app);
+            await addDoc(collection(db, 'requests'), {
+                uid: user.uid,
+                citizenName: user.name,
+                email: user.email,
+                category: formData.category,
+                subject: formData.subject,
+                description: formData.description,
+                status: 'Pending', // Pending, Reviewed, Resolved
+                createdAt: serverTimestamp(),
+                read: false
+            });
+
             setSubmitted(true);
-        }, 1000);
+        } catch (error) {
+            console.error("Error submitting request:", error);
+            // Optionally set an error state here to show to user
+        } finally {
+            setLoading(false);
+        }
     };
 
     if (submitted) {
@@ -95,8 +120,8 @@ const Requests: React.FC = () => {
                     </div>
 
                     <div className="pt-4">
-                        <button type="submit" className="w-full bg-primary text-black font-bold uppercase tracking-widest py-4 rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
-                            <Send size={18} /> Submit Request
+                        <button disabled={loading} type="submit" className="w-full bg-primary text-black font-bold uppercase tracking-widest py-4 rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
+                            <Send size={18} /> {loading ? 'Transmitting...' : 'Submit Request'}
                         </button>
                     </div>
                 </form>
