@@ -52,15 +52,25 @@ const ScanDemo: React.FC = () => {
                 const caseData = randomCase.data();
                 const confidence = Math.floor(Math.random() * (99 - 85) + 85); // 85-99%
 
-                // Create Alert in Firestore
-                await addDoc(collection(db, 'alerts'), {
-                    caseId: randomCase.id,
-                    officerId: user.uid,
+                // Import helper for ID generation and sanitization
+                const { sanitizeForFirestore, generateAlertId } = await import('../../lib/firestoreHelpers');
+
+                // Build alert data with ZERO undefined values
+                const alertData = {
+                    alertId: generateAlertId(),
+                    caseId: randomCase.id || '',
+                    officerId: user.uid || '',
                     confidence: confidence,
                     status: 'New',
                     timestamp: serverTimestamp(),
                     details: 'Biometric Match from public surveillance feed #CAM-04'
-                });
+                };
+
+                // ✅ SANITIZE before sending to Firestore
+                const safeAlertData = sanitizeForFirestore(alertData);
+
+                // Create Alert in Firestore
+                await addDoc(collection(db, 'alerts'), safeAlertData);
 
                 setMatchDetails({
                     name: caseData.subjectName,

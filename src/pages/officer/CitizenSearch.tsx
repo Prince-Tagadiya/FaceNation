@@ -81,16 +81,26 @@ const CitizenSearch: React.FC = () => {
         if (!selectedCitizen || !user) return;
 
         try {
-            await addDoc(collection(db, 'cases'), {
-                type: newCaseType,
+            // Import Firestore helpers
+            const { sanitizeForFirestore, generateCaseId } = await import('../../lib/firestoreHelpers');
+            
+            // Build case data with ZERO undefined values
+            const caseData = {
+                caseId: generateCaseId(),
+                type: newCaseType || 'Missing Person',
                 status: 'Active',
-                subjectName: selectedCitizen.name,
-                subjectId: selectedCitizen.uid,
-                assignedOfficerId: user.uid,
-                description: newCaseDesc,
+                subjectName: selectedCitizen.name || 'Unknown',
+                subjectId: selectedCitizen.uid || `SUB-${Date.now()}`, // ✅ NEVER undefined
+                assignedOfficerId: user.uid || '',
+                description: newCaseDesc || '',
                 createdAt: serverTimestamp(),
                 lastUpdated: serverTimestamp()
-            });
+            };
+
+            // ✅ SANITIZE before sending to Firestore
+            const safeCaseData = sanitizeForFirestore(caseData);
+
+            await addDoc(collection(db, 'cases'), safeCaseData);
             setShowCreateForm(false);
             setNewCaseDesc('');
             // Refresh cases
