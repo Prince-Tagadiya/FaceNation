@@ -13,13 +13,14 @@ import {
     LayoutDashboard, Settings, UserCog, AlertCircle, Ban, CheckCircle, Save,
     Search, Filter, X, Info
 } from 'lucide-react';
+import CitizenManagement from '../components/CitizenManagement';
 
 const AdminDashboard: React.FC = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     // Tabs
-    const [activeTab, setActiveTab] = useState<'overview' | 'personnel' | 'audit' | 'settings'>('overview');
+    const [activeTab, setActiveTab] = useState<'overview' | 'personnel' | 'citizens' | 'audit' | 'settings'>('overview');
 
     // Data State
     const [usersList, setUsersList] = useState<UserData[]>([]);
@@ -330,6 +331,9 @@ const AdminDashboard: React.FC = () => {
                     <button onClick={() => setActiveTab('personnel')} className={`flex items-center gap-3 px-4 py-3 rounded text-sm font-bold transition-all ${activeTab === 'personnel' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
                         <UserCog size={18} /> USER MANAGEMENT
                     </button>
+                    <button onClick={() => setActiveTab('citizens')} className={`flex items-center gap-3 px-4 py-3 rounded text-sm font-bold transition-all ${activeTab === 'citizens' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
+                        <Users size={18} /> CITIZEN REGISTRY
+                    </button>
                     <button onClick={() => setActiveTab('audit')} className={`flex items-center gap-3 px-4 py-3 rounded text-sm font-bold transition-all ${activeTab === 'audit' ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}>
                         <FileText size={18} /> AUDIT LOGS
                     </button>
@@ -552,6 +556,13 @@ const AdminDashboard: React.FC = () => {
                             </div>
 
                             {/* User Profile Modal */}
+                        </div>
+                    )}
+
+                    {/* CITIZEN REGISTRY TAB */}
+                    {activeTab === 'citizens' && (
+                        <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 h-full">
+                            <CitizenManagement />
                         </div>
                     )}
 

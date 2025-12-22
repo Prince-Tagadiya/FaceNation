@@ -34,6 +34,9 @@ export interface UserData {
   createdAt: string;
   createdBy?: string; // UID of the admin who created this user
   tempPassword?: string;
+  faceRef?: string;
+  faceCapturedAt?: any; // Firestore Timestamp
+  faceCapturedBy?: string;
 }
 
 export type CaseType = 'Missing Person' | 'High-Value Suspect' | 'Criminal Record';
