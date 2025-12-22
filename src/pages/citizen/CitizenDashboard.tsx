@@ -1,9 +1,39 @@
-import React from 'react';
-import { Shield, Activity, FileText, Bell, Clock } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Shield, Activity, FileText, Bell, Clock, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { getFirestore, collection, query, where, onSnapshot } from 'firebase/firestore';
+import { app } from '../../lib/firebase';
+import { useNavigate } from 'react-router-dom';
+
+interface CaseData {
+    id: string;
+    status: string;
+}
 
 const CitizenDashboard: React.FC = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
+    const [caseCount, setCaseCount] = useState<number>(0);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        if (!user) return;
+
+        const db = getFirestore(app);
+
+        // Fetch case count matches subjectId
+        const q = query(
+            collection(db, 'cases'),
+            where('subjectId', '==', user.uid)
+        );
+
+        const unsubscribe = onSnapshot(q, (snapshot) => {
+            setCaseCount(snapshot.size);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, [user]);
 
     return (
         <div className="space-y-8">
@@ -31,9 +61,16 @@ const CitizenDashboard: React.FC = () => {
                         <Shield size={120} />
                     </div>
 
-                    <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                        <Shield className="text-primary" size={20} /> Digital Identity Status
-                    </h2>
+                    <div className="flex justify-between items-start mb-6">
+                        <h2 className="text-lg font-bold flex items-center gap-2">
+                            <Shield className="text-primary" size={20} /> Digital Identity Status
+                        </h2>
+                        {!loading && caseCount > 0 && (
+                            <span className="px-3 py-1 bg-red-500/20 text-red-400 border border-red-500/30 rounded-full text-xs font-bold animate-pulse flex items-center gap-2">
+                                <AlertCircle size={12} /> {caseCount} ACTIVE CASE{caseCount > 1 ? 'S' : ''} DETECTED
+                            </span>
+                        )}
+                    </div>
 
                     <div className="grid grid-cols-2 gap-8 relative z-10">
                         <div>
@@ -84,12 +121,16 @@ const CitizenDashboard: React.FC = () => {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[
-                    { icon: FileText, label: "View Profile", desc: "Manage personal data", color: "text-blue-400" },
-                    { icon: Activity, label: "Status Report", desc: "Check active monitors", color: "text-green-400" },
-                    { icon: Clock, label: "History", desc: "Access logs", color: "text-orange-400" },
-                    { icon: Shield, label: "Privacy Settings", desc: "Adjust visibility", color: "text-red-400" },
+                    { icon: FileText, label: "View Profile", desc: "Manage personal data", color: "text-blue-400", path: "/citizen/profile" },
+                    { icon: Activity, label: "Status Report", desc: "Check active monitors", color: "text-green-400", path: "/citizen/status" },
+                    { icon: Clock, label: "History", desc: "Access logs", color: "text-orange-400", path: "/citizen/history" },
+                    { icon: Shield, label: "Privacy Settings", desc: "Adjust visibility", color: "text-red-400", path: "/citizen/settings" },
                 ].map((action, idx) => (
-                    <button key={idx} className="p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-primary/30 transition-all text-left group">
+                    <button
+                        key={idx}
+                        onClick={() => navigate(action.path)}
+                        className="p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-primary/30 transition-all text-left group"
+                    >
                         <action.icon className={`${action.color} mb-3 group-hover:scale-110 transition-transform`} size={24} />
                         <h3 className="font-bold text-sm text-white mb-1">{action.label}</h3>
                         <p className="text-xs text-gray-500">{action.desc}</p>
