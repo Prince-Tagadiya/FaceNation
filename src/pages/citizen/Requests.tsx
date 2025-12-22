@@ -74,114 +74,173 @@ const Requests: React.FC = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column: Submission Form */}
-            <div>
-                <h1 className="text-3xl font-bold text-white mb-2">Submit Request</h1>
-                <p className="text-gray-400 mb-8">Official channel for government inquiries.</p>
-
-                {submitted ? (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-8 text-center">
-                        <div className="w-16 h-16 bg-green-500/10 border border-green-500/20 rounded-full flex items-center justify-center mb-4 mx-auto">
-                            <Send className="text-green-500" size={24} />
-                        </div>
-                        <h2 className="text-xl font-bold text-white mb-2">Request Submitted</h2>
-                        <p className="text-gray-400 text-sm mb-6">
-                            Your request has been queued. Check the history panel for updates.
-                        </p>
-                        <button
-                            onClick={() => { setSubmitted(false); setFormData({ category: 'Clarification', subject: '', description: '' }); }}
-                            className="text-primary text-sm hover:underline"
-                        >
-                            Submit Another Request
-                        </button>
+        <div className="max-w-6xl mx-auto space-y-10 pb-20">
+            {/* Styled Header */}
+            <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+                        <Send className="text-primary" size={18} />
                     </div>
-                ) : (
-                    <div className="bg-white/5 border border-white/10 rounded-2xl p-8">
-                        <form onSubmit={handleSubmit} className="space-y-6">
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase text-gray-500 font-mono tracking-widest">Request Category</label>
-                                <select
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:border-primary/50 outline-none transition-colors"
-                                >
-                                    <option>Clarification</option>
-                                    <option>Data Correction</option>
-                                    <option>Privacy Conflict</option>
-                                    <option>Other</option>
-                                </select>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase text-gray-500 font-mono tracking-widest">Subject</label>
-                                <input
-                                    required
-                                    type="text"
-                                    value={formData.subject}
-                                    onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:border-primary/50 outline-none transition-colors placeholder:text-gray-700"
-                                    placeholder="Brief summary..."
-                                />
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-xs uppercase text-gray-500 font-mono tracking-widest">Detailed Description</label>
-                                <textarea
-                                    required
-                                    rows={4}
-                                    value={formData.description}
-                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                    className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:border-primary/50 outline-none transition-colors placeholder:text-gray-700 resize-none"
-                                    placeholder="Provide details..."
-                                />
-                            </div>
-
-                            <button disabled={loading} type="submit" className="w-full bg-primary text-black font-bold uppercase tracking-widest py-3 rounded-xl hover:bg-primary/90 transition-all flex items-center justify-center gap-2">
-                                <Send size={18} /> {loading ? 'Transmitting...' : 'Submit Request'}
-                            </button>
-                        </form>
-                    </div>
-                )}
+                    <span className="text-xs font-mono text-primary uppercase tracking-[0.2em] font-bold">Communications Link</span>
+                </div>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Inquiry Protocol</h1>
+                <p className="text-gray-400 font-medium text-sm md:text-base">Official encrypted channel for government data synchronization and clarification.</p>
             </div>
 
-            {/* Right Column: History */}
-            <div className="flex flex-col h-full">
-                <h2 className="text-xl font-bold text-white mb-2 flex items-center gap-2">
-                    <Clock size={20} className="text-gray-400" /> Request History
-                </h2>
-                <p className="text-gray-400 mb-8 text-sm">Track the status of your previous inquiries.</p>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                {/* Left Column: Submission Form */}
+                <div className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-[2rem] blur opacity-10 transition-opacity"></div>
 
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 flex-1 overflow-y-auto max-h-[600px] space-y-4 custom-scrollbar">
-                    {loadingHistory ? (
-                        <div className="text-center text-gray-500 py-10 text-xs font-mono uppercase">Loading History...</div>
-                    ) : history.length === 0 ? (
-                        <div className="text-center text-gray-500 py-10">
-                            <FileText className="mx-auto mb-2 opacity-20" size={48} />
-                            <p className="text-sm">No requests found.</p>
-                        </div>
-                    ) : (
-                        history.map((req) => (
-                            <div key={req.id} className="bg-black/20 border border-white/5 p-4 rounded-xl hover:bg-white/5 transition-colors group">
-                                <div className="flex justify-between items-start mb-2">
-                                    <span className="text-xs font-mono text-gray-500">
-                                        {req.createdAt?.seconds ? new Date(req.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
-                                    </span>
-                                    <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full border ${req.status === 'Resolved' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
-                                            req.status === 'Rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
-                                                'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
-                                        }`}>
-                                        {req.status}
-                                    </span>
+                    <div className="relative bg-[#080808]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-10">
+                        {submitted ? (
+                            <div className="py-12 text-center space-y-6">
+                                <div className="relative inline-block">
+                                    <div className="absolute -inset-4 bg-green-500/20 rounded-full blur-xl animate-pulse"></div>
+                                    <div className="relative w-20 h-20 bg-green-500/10 border border-green-500/30 rounded-full flex items-center justify-center mx-auto shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+                                        <Send className="text-green-500" size={32} />
+                                    </div>
                                 </div>
-                                <h3 className="font-bold text-white text-sm mb-1">{req.subject}</h3>
-                                <p className="text-xs text-gray-400 mb-2">{req.category}</p>
-                                <p className="text-xs text-slate-500 line-clamp-2 group-hover:line-clamp-none transition-all">
-                                    {req.description}
-                                </p>
+                                <div className="space-y-2">
+                                    <h2 className="text-2xl font-black text-white uppercase tracking-tight">Transmission Successful</h2>
+                                    <p className="text-gray-400 text-sm max-w-xs mx-auto">
+                                        Your inquiry has been encrypted and queued for review by the Central Oversight Committee.
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={() => { setSubmitted(false); setFormData({ category: 'Clarification', subject: '', description: '' }); }}
+                                    className="px-6 py-2.5 bg-white/5 border border-white/10 rounded-xl text-[10px] font-black font-mono text-primary uppercase tracking-[0.2em] hover:bg-primary/5 hover:border-primary/30 transition-all"
+                                >
+                                    Initiate New Inquiry
+                                </button>
                             </div>
-                        ))
-                    )}
+                        ) : (
+                            <form onSubmit={handleSubmit} className="space-y-8">
+                                <div className="flex items-center gap-3 pb-4 border-b border-white/5">
+                                    <div className="w-1.5 h-4 bg-primary rounded-full"></div>
+                                    <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-500">New Inquiry Dispatch</h3>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6">
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] uppercase text-gray-600 font-mono tracking-widest font-black">Designation</label>
+                                        <div className="relative group/select">
+                                            <select
+                                                value={formData.category}
+                                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                                className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-primary/50 outline-none transition-all appearance-none cursor-pointer group-hover/select:bg-black/60"
+                                            >
+                                                <option>Clarification</option>
+                                                <option>Data Correction</option>
+                                                <option>Privacy Conflict</option>
+                                                <option>Other</option>
+                                            </select>
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-600">
+                                                <AlertCircle size={16} />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] uppercase text-gray-600 font-mono tracking-widest font-black">Subject Header</label>
+                                        <input
+                                            required
+                                            type="text"
+                                            value={formData.subject}
+                                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-primary/50 outline-none transition-all placeholder:text-gray-800"
+                                            placeholder="CRYPTO-HEADER SUMMARY"
+                                        />
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <label className="text-[10px] uppercase text-gray-600 font-mono tracking-widest font-black">Intelligence Detail</label>
+                                        <textarea
+                                            required
+                                            rows={5}
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            className="w-full bg-black/40 border border-white/10 rounded-2xl p-4 text-sm text-white focus:border-primary/50 outline-none transition-all placeholder:text-gray-800 resize-none"
+                                            placeholder="PROVIDE FULL DISCLOSURE DATA..."
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    disabled={loading}
+                                    type="submit"
+                                    className="w-full group/btn relative overflow-hidden bg-primary py-4 rounded-2xl transition-all hover:shadow-[0_0_25px_rgba(0,240,255,0.3)] disabled:opacity-50"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]"></div>
+                                    <div className="relative flex items-center justify-center gap-3 text-black font-black uppercase tracking-[0.2em] text-xs">
+                                        <Send size={18} />
+                                        {loading ? 'Transmitting Data...' : 'Dispatch Inquiry'}
+                                    </div>
+                                </button>
+                            </form>
+                        )}
+                    </div>
+                </div>
+
+                {/* Right Column: History */}
+                <div className="flex flex-col space-y-6">
+                    <div className="flex items-center justify-between px-2">
+                        <div className="flex items-center gap-3">
+                            <Clock size={16} className="text-gray-500" />
+                            <h2 className="text-xs font-black text-gray-500 uppercase tracking-[0.3em]">Dispatch History</h2>
+                        </div>
+                        <span className="text-[10px] font-mono text-gray-700 tracking-widest uppercase">{history.length} RECORDS FOUND</span>
+                    </div>
+
+                    <div className="bg-white/[0.02] border border-white/5 rounded-[2rem] p-2 flex-1 overflow-hidden flex flex-col min-h-[500px]">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
+                            {loadingHistory ? (
+                                <div className="flex flex-col items-center justify-center h-full space-y-4 opacity-30">
+                                    <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                                    <p className="text-[10px] font-mono tracking-[0.3em] uppercase">Syncing Records</p>
+                                </div>
+                            ) : history.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center h-full space-y-6 py-20 opacity-20">
+                                    <FileText size={64} strokeWidth={1} />
+                                    <p className="text-xs font-mono tracking-[0.3em] uppercase">No Archived Communications</p>
+                                </div>
+                            ) : (
+                                history.map((req, idx) => (
+                                    <div
+                                        key={req.id}
+                                        className="relative group/item"
+                                        style={{ animationDelay: `${idx * 100}ms` }}
+                                    >
+                                        <div className="absolute -inset-px bg-gradient-to-r from-primary/10 to-transparent rounded-2xl opacity-0 group-hover/item:opacity-100 transition-opacity"></div>
+                                        <div className="relative p-6 bg-white/[0.03] border border-white/5 rounded-2xl hover:bg-white/[0.05] hover:border-white/10 transition-all">
+                                            <div className="flex justify-between items-start mb-4">
+                                                <div className="px-2.5 py-1 bg-black/40 rounded-lg border border-white/5">
+                                                    <span className="text-[9px] font-mono text-gray-500 font-bold uppercase tracking-widest">
+                                                        {req.createdAt?.seconds ? new Date(req.createdAt.seconds * 1000).toLocaleDateString() : 'REAL-TIME'}
+                                                    </span>
+                                                </div>
+                                                <div className={`text-[9px] font-black tracking-[0.15em] px-3 py-1 rounded-full border shadow-sm uppercase
+                                                    ${req.status === 'Resolved' ? 'text-green-400 border-green-500/30 bg-green-500/10' :
+                                                        req.status === 'Rejected' ? 'text-red-400 border-red-500/30 bg-red-500/10' :
+                                                            'text-yellow-400 border-yellow-500/30 bg-yellow-400/10'}`}>
+                                                    {req.status}
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-1 mb-4">
+                                                <p className="text-[9px] font-mono text-primary font-bold uppercase tracking-widest">{req.category}</p>
+                                                <h3 className="font-black text-white text-base tracking-tight">{req.subject}</h3>
+                                            </div>
+
+                                            <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 group-hover/item:line-clamp-none transition-all font-medium">
+                                                {req.description}
+                                            </p>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
