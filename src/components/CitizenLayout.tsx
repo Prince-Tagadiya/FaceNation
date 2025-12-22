@@ -18,7 +18,7 @@ const CitizenLayout: React.FC = () => {
         { path: '/citizen/dashboard', icon: Shield, label: 'Dashboard' },
         { path: '/citizen/profile', icon: User, label: 'My Profile' },
         { path: '/citizen/status', icon: Activity, label: 'My Status' },
-        { path: '/citizen/history', icon: Clock, label: 'History' },
+        { path: '/citizen/cases', icon: FileText, label: 'My Cases' },
         { path: '/citizen/requests', icon: Send, label: 'Requests' },
     ];
 

@@ -123,7 +123,7 @@ const CitizenDashboard: React.FC = () => {
                 {[
                     { icon: FileText, label: "View Profile", desc: "Manage personal data", color: "text-blue-400", path: "/citizen/profile" },
                     { icon: Activity, label: "Status Report", desc: "Check active monitors", color: "text-green-400", path: "/citizen/status" },
-                    { icon: Clock, label: "History", desc: "Access logs", color: "text-orange-400", path: "/citizen/history" },
+                    { icon: Clock, label: "My Cases", desc: "View legal records", color: "text-orange-400", path: "/citizen/cases" },
                     { icon: Shield, label: "Privacy Settings", desc: "Adjust visibility", color: "text-red-400", path: "/citizen/settings" },
                 ].map((action, idx) => (
                     <button

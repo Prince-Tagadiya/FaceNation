@@ -20,7 +20,7 @@ import CitizenDashboard from './pages/citizen/CitizenDashboard';
 import MyProfile from './pages/citizen/MyProfile';
 import MyStatus from './pages/citizen/MyStatus';
 import Requests from './pages/citizen/Requests';
-import History from './pages/citizen/History';
+import Cases from './pages/citizen/Cases';
 
 // Protected Route Component with Role Check
 const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode, allowedRoles?: UserRole[] }) => {
@@ -79,7 +79,7 @@ const AppRoutes = () => {
                 <Route path="dashboard" element={<CitizenDashboard />} />
                 <Route path="profile" element={<MyProfile />} />
                 <Route path="status" element={<MyStatus />} />
-                <Route path="history" element={<History />} />
+                <Route path="cases" element={<Cases />} />
                 <Route path="requests" element={<Requests />} />
                 <Route index element={<Navigate to="dashboard" replace />} />
             </Route>
@@ -91,15 +91,15 @@ const AppRoutes = () => {
 }
 
 const App: React.FC = () => {
-  return (
-    <Router>
-        <AuthProvider>
-            <ToastProvider>
-                <AppRoutes />
-            </ToastProvider>
-        </AuthProvider>
-    </Router>
-  );
+    return (
+        <Router>
+            <AuthProvider>
+                <ToastProvider>
+                    <AppRoutes />
+                </ToastProvider>
+            </AuthProvider>
+        </Router>
+    );
 };
 
 export default App;
