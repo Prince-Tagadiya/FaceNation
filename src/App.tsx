@@ -7,6 +7,7 @@ import { UserRole } from './types';
 // Pages
 import LandingPage from './pages/LandingPage';
 import Login from './pages/Login';
+import AdminLogin from './pages/AdminLogin';
 import Setup from './pages/Setup';
 import CitizenRegister from './pages/CitizenRegister';
 import AdminDashboard from './pages/AdminDashboard';
@@ -28,7 +29,12 @@ const ProtectedRoute = ({ children, allowedRoles }: { children: React.ReactNode,
 
     if (loading) return <div className="h-screen w-full bg-black text-white flex items-center justify-center font-mono text-xs">VERIFYING IDENTITY TOKEN...</div>;
 
-    if (!user) return <Navigate to="/login" replace />;
+    if (!user) {
+        if (allowedRoles?.includes('System Admin')) {
+            return <Navigate to="/admin-login" replace />;
+        }
+        return <Navigate to="/login" replace />;
+    }
 
     if (allowedRoles && !allowedRoles.includes(user.role)) {
         return <Navigate to="/" replace />;
@@ -42,6 +48,7 @@ const AppRoutes = () => {
         <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/admin-login" element={<AdminLogin />} />
             <Route path="/register" element={<CitizenRegister />} />
             <Route path="/setup" element={<Setup />} />
 

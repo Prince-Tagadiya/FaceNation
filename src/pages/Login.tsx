@@ -41,7 +41,8 @@ const Login: React.FC = () => {
 
         switch (role) {
           case 'System Admin':
-            navigate('/admin');
+            setError('RESTRICTED: Please use the dedicated Admin Console.');
+            await auth.signOut();
             break;
           case 'Investigating Officer':
             navigate('/officer');
@@ -179,6 +180,13 @@ const Login: React.FC = () => {
             <UserPlus className="w-3 h-3" />
             Create Admin (dev_admin@facenation.gov)
           </button>
+
+          <div className="mt-4 text-center border-t border-white/5 pt-4">
+            <a href="/admin-login" className="text-[9px] text-slate-500 hover:text-blue-400 font-mono uppercase tracking-widest transition-colors flex items-center justify-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-700"></span>
+              Secure Admin Console
+            </a>
+          </div>
         </form>
       </div>
     </div>
