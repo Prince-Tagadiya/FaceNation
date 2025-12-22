@@ -8,12 +8,16 @@ import { useNavigate } from 'react-router-dom';
 interface CaseData {
     id: string;
     status: string;
+    caseNumber: string;
+    description: string;
+    createdAt: any;
 }
 
 const CitizenDashboard: React.FC = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [caseCount, setCaseCount] = useState<number>(0);
+    const [recentCases, setRecentCases] = useState<CaseData[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -24,11 +28,21 @@ const CitizenDashboard: React.FC = () => {
         // Fetch case count matches subjectId
         const q = query(
             collection(db, 'cases'),
-            where('subjectId', '==', user.uid)
+            where('subjectName', '==', user.name)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
             setCaseCount(snapshot.size);
+
+            const fetchedCases = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            })) as CaseData[];
+
+            // Sort by createdAt desc
+            fetchedCases.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+            setRecentCases(fetchedCases.slice(0, 3));
             setLoading(false);
         });
 
@@ -101,19 +115,24 @@ const CitizenDashboard: React.FC = () => {
                     </h2>
 
                     <div className="flex-1 space-y-4">
-                        {[1, 2, 3].map((i) => (
-                            <div key={i} className="p-3 bg-black/20 rounded-lg border border-white/5 hover:border-white/10 transition-colors cursor-pointer">
-                                <div className="flex justify-between items-start mb-1">
-                                    <span className="text-xs font-bold text-white">System Update</span>
-                                    <span className="text-[10px] text-gray-500 font-mono">10:4{i} AM</span>
+                        {recentCases.length === 0 ? (
+                            <div className="text-center text-gray-500 py-4 text-xs">No active memos or alerts.</div>
+                        ) : (
+                            recentCases.map((c) => (
+                                <div key={c.id} className="p-3 bg-black/20 rounded-lg border border-white/5 hover:border-white/10 transition-colors cursor-pointer" onClick={() => navigate('/citizen/cases')}>
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="text-xs font-bold text-white">{c.caseNumber}</span>
+                                        <span className={`text-[10px] font-mono px-1.5 rounded border ${c.status === 'Open' ? 'text-red-400 border-red-500/30 bg-red-500/10' : 'text-green-400 border-green-500/30 bg-green-500/10'
+                                            }`}>{c.status}</span>
+                                    </div>
+                                    <p className="text-xs text-gray-400 line-clamp-2">{c.description}</p>
                                 </div>
-                                <p className="text-xs text-gray-400 line-clamp-2">The transparency layer has been updated to version 2.4.{i}. Please review your settings.</p>
-                            </div>
-                        ))}
+                            ))
+                        )}
                     </div>
 
-                    <button className="w-full mt-4 py-2 text-xs font-mono text-center text-gray-400 hover:text-white border border-white/10 rounded hover:bg-white/5 transition-all">
-                        VIEW ALL MEMOS
+                    <button onClick={() => navigate('/citizen/cases')} className="w-full mt-4 py-2 text-xs font-mono text-center text-gray-400 hover:text-white border border-white/10 rounded hover:bg-white/5 transition-all">
+                        VIEW ALL CASES
                     </button>
                 </div>
             </div>
