@@ -1,21 +1,8 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { getAuth, onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '../lib/firebase';
-
-// Role Definitions
-export type UserRole = 
-  | 'System Admin'
-  | 'Investigating Officer' 
-  | 'Control Room Operator' 
-  | 'Citizen';
-
-interface UserData {
-  uid: string;
-  email: string | null;
-  role: UserRole;
-  name: string;
-}
+import { UserData } from '../types';
 
 interface AuthContextType {
   user: UserData | null;
@@ -43,22 +30,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (firebaseUser) {
         try {
           const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
+          
           if (userDoc.exists()) {
             const data = userDoc.data();
-            setUser({
-              uid: firebaseUser.uid,
-              email: firebaseUser.email,
-              role: data.role as UserRole,
-              name: data.name || 'User',
-            });
+            
+            // STRICT SECURITY CHECK: User must be active
+            if (data.active === false) {
+              console.error("Access Denied: Account is inactive.");
+              await signOut(auth);
+              setUser(null);
+            } else {
+               setUser({
+                uid: firebaseUser.uid,
+                email: firebaseUser.email,
+                role: data.role,
+                name: data.name || 'User',
+                active: data.active ?? true, // Default to true if missing for legacy/seed reasons
+                createdAt: data.createdAt,
+                createdBy: data.createdBy
+              });
+            }
           } else {
-            // Fallback for users without role data (unlikely in this locked system)
-            console.error("User document not found.");
+            console.error("Access Denied: User profile not found.");
+            await signOut(auth);
             setUser(null);
           }
         } catch (error) {
           console.error("Error fetching user role:", error);
-          setUser(null);
+          // Don't sign out on network error, but don't set user either - just leave as null (loading state finished)
+          // Or maybe safer to set null.
+          setUser(null); 
         }
       } else {
         setUser(null);

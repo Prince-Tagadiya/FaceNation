@@ -18,3 +18,19 @@ export interface Section {
 }
 
 export type SceneState = 'face' | 'vault' | 'network' | 'privacy' | 'cta';
+
+export type UserRole = 
+  | 'System Admin'
+  | 'Investigating Officer' 
+  | 'Control Room Operator' 
+  | 'Citizen';
+
+export interface UserData {
+  uid: string;
+  email: string | null;
+  role: UserRole;
+  name: string;
+  active: boolean;
+  createdAt: string;
+  createdBy?: string; // UID of the admin who created this user
+}

@@ -3,6 +3,7 @@ import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { app } from '../lib/firebase';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -18,13 +19,51 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      navigate('/dashboard'); // Redirect to dashboard which handles role-based view
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const uid = userCredential.user.uid;
+      
+      // Auto Role Detection & Redirection
+      const userDoc = await getDoc(doc(getFirestore(app), 'users', uid));
+      
+      if (userDoc.exists()) {
+          const userData = userDoc.data();
+          
+          if (userData.active === false) {
+              setError('Access Denied: Account has been deactivated.');
+              await auth.signOut();
+              setLoading(false);
+              return;
+          }
+
+          const role = userData.role;
+          
+          switch(role) {
+              case 'System Admin':
+                  navigate('/admin');
+                  break;
+              case 'Investigating Officer':
+                  navigate('/officer');
+                  break;
+              case 'Control Room Operator':
+                  navigate('/control');
+                  break;
+              case 'Citizen':
+                  navigate('/citizen');
+                  break;
+              default:
+                  setError('Access Denied: Invalid Role Configuration.');
+                  await auth.signOut();
+          }
+      } else {
+          setError('Access Denied: No user profile found.');
+          await auth.signOut();
+      }
+
     } catch (err: any) {
       console.error(err);
       setError('Access Denied: Invalid credentials or insufficient permissions.');
     } finally {
-      setLoading(false);
+      if (!error) setLoading(false); // Only unset loading if we didn't error (if we navigated, component unmounts mostly)
     }
   };
 
