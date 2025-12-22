@@ -39,6 +39,17 @@ const AdminDashboard: React.FC = () => {
     const [role, setRole] = useState<UserRole>('Investigating Officer');
     const [showPassword, setShowPassword] = useState<{ [key: string]: boolean }>({});
 
+    // User Management State
+    const [selectedUser, setSelectedUser] = useState<UserData | null>(null);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [roleFilter, setRoleFilter] = useState('All');
+
+    const filteredUsers = usersList.filter(user => {
+        const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesRole = roleFilter === 'All' || user.role === roleFilter;
+        return matchesSearch && matchesRole;
+    });
+
     useEffect(() => {
         const db = getFirestore(app);
 
@@ -353,9 +364,33 @@ const AdminDashboard: React.FC = () => {
 
                                 {/* User List */}
                                 <div className="xl:col-span-2 bg-slate-900 border border-slate-800 rounded-lg overflow-hidden flex flex-col max-h-[700px]">
-                                    <div className="bg-slate-800/50 px-6 py-4 border-b border-slate-800">
+                                    <div className="bg-slate-800/50 px-6 py-4 border-b border-slate-800 flex justify-between items-center">
                                         <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Active Roster</h3>
                                     </div>
+
+                                    {/* Filters & Search - NEW ADDITION */}
+                                    <div className="p-4 grid grid-cols-2 gap-4 border-b border-slate-800 bg-slate-900/50">
+                                        <div className="relative">
+                                            <input
+                                                placeholder="Search by name..."
+                                                value={searchTerm}
+                                                onChange={(e) => setSearchTerm(e.target.value)}
+                                                className="w-full bg-slate-950 border border-slate-700 rounded pl-8 p-2 text-xs focus:border-blue-500 outline-none text-white placeholder-slate-600"
+                                            />
+                                            <UserCog className="absolute left-2.5 top-2 text-slate-600" size={14} />
+                                        </div>
+                                        <select
+                                            value={roleFilter}
+                                            onChange={(e) => setRoleFilter(e.target.value)}
+                                            className="bg-slate-950 border border-slate-700 rounded p-2 text-xs focus:border-blue-500 outline-none text-slate-300"
+                                        >
+                                            <option value="All">All Roles</option>
+                                            <option value="Investigating Officer">Investigating Officer</option>
+                                            <option value="Control Room Operator">Control Room Operator</option>
+                                            <option value="Citizen">Citizen</option>
+                                        </select>
+                                    </div>
+
                                     <div className="overflow-auto flex-1">
                                         <table className="w-full text-left text-sm">
                                             <thead className="bg-slate-950 text-slate-500 text-[10px] uppercase sticky top-0 z-10">
@@ -367,7 +402,13 @@ const AdminDashboard: React.FC = () => {
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-800">
-                                                {usersList.map((u) => (
+                                                {filteredUsers.length === 0 ? (
+                                                    <tr>
+                                                        <td colSpan={4} className="p-8 text-center text-slate-500 text-xs italic">
+                                                            No matches found.
+                                                        </td>
+                                                    </tr>
+                                                ) : filteredUsers.map((u) => (
                                                     <tr key={u.uid} className="hover:bg-slate-800/30">
                                                         <td className="p-4">
                                                             <div className="font-bold text-white">{u.name}</div>
@@ -397,6 +438,13 @@ const AdminDashboard: React.FC = () => {
                                                         </td>
                                                         <td className="p-4 text-right space-x-2">
                                                             <button
+                                                                onClick={() => setSelectedUser(u)}
+                                                                className="text-slate-600 hover:text-blue-500 hover:bg-blue-900/20 p-1.5 rounded transition-colors"
+                                                                title="View Profile"
+                                                            >
+                                                                <Eye size={16} />
+                                                            </button>
+                                                            <button
                                                                 onClick={() => handleToggleUserStatus(u.uid, u.active, u.name)}
                                                                 className={`p-1.5 rounded transition-colors ${u.active ? 'text-amber-500 hover:bg-amber-900/20' : 'text-green-500 hover:bg-green-900/20'}`}
                                                                 title={u.active ? "Disable Access" : "Enable Access"}
@@ -418,9 +466,69 @@ const AdminDashboard: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* User Profile Modal */}
+                            {selectedUser && (
+                                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                                    <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl relative">
+                                        <button
+                                            onClick={() => setSelectedUser(null)}
+                                            className="absolute top-4 right-4 text-slate-500 hover:text-white transition-colors"
+                                        >
+                                            <EyeOff size={20} />
+                                        </button>
+
+                                        <div className="bg-gradient-to-r from-blue-900/20 to-purple-900/20 p-8 text-center border-b border-slate-800">
+                                            <div className="w-24 h-24 bg-slate-800 rounded-full mx-auto flex items-center justify-center border-4 border-slate-700 mb-4 shadow-xl">
+                                                <span className="text-4xl font-bold text-slate-400">{selectedUser.name.charAt(0)}</span>
+                                            </div>
+                                            <h2 className="text-2xl font-bold text-white mb-1">{selectedUser.name}</h2>
+                                            <p className="text-sm text-slate-400 font-mono tracking-widest uppercase">{selectedUser.role}</p>
+                                        </div>
+
+                                        <div className="p-8 space-y-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="p-4 bg-slate-950/50 rounded-xl border border-slate-800">
+                                                    <p className="text-[10px] uppercase text-slate-500 font-mono mb-1">Status</p>
+                                                    <p className={`font-bold ${selectedUser.active ? 'text-green-500' : 'text-red-500'}`}>
+                                                        {selectedUser.active ? 'ACTIVE' : 'DISABLED'}
+                                                    </p>
+                                                </div>
+                                                <div className="p-4 bg-slate-950/50 rounded-xl border border-slate-800">
+                                                    <p className="text-[10px] uppercase text-slate-500 font-mono mb-1">User ID</p>
+                                                    <p className="text-xs text-slate-300 font-mono truncate" title={selectedUser.uid}>{selectedUser.uid.slice(0, 12)}...</p>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <div className="flex justify-between items-center py-2 border-b border-slate-800/50">
+                                                    <span className="text-sm text-slate-400">Email Address</span>
+                                                    <span className="text-sm text-white font-medium">{selectedUser.email}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center py-2 border-b border-slate-800/50">
+                                                    <span className="text-sm text-slate-400">Registration Date</span>
+                                                    <span className="text-sm text-white font-medium">{new Date(selectedUser.createdAt).toLocaleDateString()}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center py-2 border-b border-slate-800/50">
+                                                    <span className="text-sm text-slate-400">Created By</span>
+                                                    <span className="text-xs text-slate-500 font-mono">{selectedUser.createdBy || 'SYSTEM'}</span>
+                                                </div>
+                                            </div>
+
+                                            <div className="pt-4">
+                                                <button
+                                                    onClick={() => setSelectedUser(null)}
+                                                    className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-sm transition-colors uppercase tracking-widest"
+                                                >
+                                                    Close Profile
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
                         </div>
-                    )
-                    }
+                    )}
 
                     {/* AUDIT LOGS TAB */}
                     {
