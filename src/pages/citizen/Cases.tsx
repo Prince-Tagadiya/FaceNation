@@ -23,9 +23,11 @@ const Cases: React.FC = () => {
         if (!user) return;
 
         const db = getFirestore(app);
+
+        // Sync data from firestore cases collection and compare subject name and citizen name
         const q = query(
             collection(db, 'cases'),
-            where('subjectId', '==', user.uid)
+            where('subjectName', '==', user.name)
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -109,9 +111,9 @@ const Cases: React.FC = () => {
                                             <div className="flex gap-1">
                                                 {[1, 2, 3].map(i => (
                                                     <div key={i} className={`h-1.5 w-4 rounded-full ${i === 1 ? 'bg-green-500' :
-                                                            i === 2 && (c.severity === 'Medium' || c.severity === 'High') ? 'bg-yellow-500' :
-                                                                i === 3 && c.severity === 'High' ? 'bg-red-500' :
-                                                                    'bg-white/10'
+                                                        i === 2 && (c.severity === 'Medium' || c.severity === 'High') ? 'bg-yellow-500' :
+                                                            i === 3 && c.severity === 'High' ? 'bg-red-500' :
+                                                                'bg-white/10'
                                                         }`} />
                                                 ))}
                                             </div>
