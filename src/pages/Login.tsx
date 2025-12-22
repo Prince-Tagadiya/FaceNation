@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { Lock, AlertCircle, Loader2, UserPlus } from 'lucide-react';
+import { Lock, AlertCircle, Loader2 } from 'lucide-react';
 import { app } from '../lib/firebase';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
-import { useAuth } from '../context/AuthContext';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -13,7 +12,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const auth = getAuth(app);
-  const { loginWithDemo } = useAuth();
+
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,34 +69,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const handleCreateAdmin = async () => {
-    setLoading(true);
-    setError('');
-    const db = getFirestore(app);
-    try {
-      const uniqueId = Math.floor(Math.random() * 10000);
-      const emailToCreate = `admin_${uniqueId}@facenation.gov`;
-      const passwordToCreate = "password123";
 
-      const userCredential = await createUserWithEmailAndPassword(auth, emailToCreate, passwordToCreate);
-
-      await setDoc(doc(db, "users", userCredential.user.uid), {
-        email: emailToCreate,
-        name: `Admin ${uniqueId}`,
-        role: "System Admin",
-        createdAt: new Date()
-      });
-
-      setEmail(emailToCreate);
-      setPassword(passwordToCreate);
-      setError(`Created & Filled: ${emailToCreate}`);
-    } catch (err: any) {
-      console.error(err);
-      setError(`Creation Failed: ${err.message}`);
-    } finally {
-      if (!error) setLoading(false); // Only unset loading if we didn't error (if we navigated, component unmounts mostly)
-    }
-  };
 
   return (
     <div className="min-h-screen w-full bg-[#020205] flex items-center justify-center p-4 relative overflow-hidden">
@@ -154,32 +126,7 @@ const Login: React.FC = () => {
             {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Authenticate'}
           </button>
 
-          <div className="relative flex py-2 items-center">
-            <div className="flex-grow border-t border-white/10"></div>
-            <span className="flex-shrink-0 mx-4 text-[9px] text-gray-500 uppercase tracking-widest font-mono">Development Access</span>
-            <div className="flex-grow border-t border-white/10"></div>
-          </div>
 
-          <button
-            type="button"
-            onClick={(e) => {
-              e.preventDefault();
-              loginWithDemo();
-              navigate('/dashboard');
-            }}
-            className="w-full bg-white/5 hover:bg-white/10 text-gray-300 font-bold py-3 rounded-lg transition-all transform hover:scale-[1.02] active:scale-[0.98] border border-white/10 flex items-center justify-center gap-2 uppercase tracking-[0.1em] text-[10px] font-mono"
-          >
-            Initialize Demo Protocol (Bypass)
-          </button>
-
-          <button
-            type="button"
-            onClick={handleCreateAdmin}
-            className="w-full mt-2 bg-transparent hover:bg-white/5 text-gray-500 hover:text-gray-300 font-mono text-[9px] py-2 transition-colors uppercase tracking-widest flex items-center justify-center gap-2"
-          >
-            <UserPlus className="w-3 h-3" />
-            Create Admin (dev_admin@facenation.gov)
-          </button>
 
           <div className="mt-4 text-center border-t border-white/5 pt-4">
             <a href="/admin-login" className="text-[9px] text-slate-500 hover:text-blue-400 font-mono uppercase tracking-widest transition-colors flex items-center justify-center gap-1">

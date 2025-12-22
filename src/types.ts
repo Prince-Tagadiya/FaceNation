@@ -35,6 +35,7 @@ export interface UserData {
   createdBy?: string; // UID of the admin who created this user
   tempPassword?: string;
   faceRef?: string;
+  photoURL?: string; // Standard Firebase Auth profile photo URL
   faceCapturedAt?: any; // Firestore Timestamp
   faceCapturedBy?: string;
 }

@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Shield, Scan, Lock, Users, Activity, EyeOff, Binary, CheckCircle } from 'lucide-react';
+import { Canvas } from '@react-three/fiber';
 import Magnetic from '../components/ui/Magnetic';
+import Scene from '../components/3d/Scene';
 import { SECTIONS, NAV_LINKS } from '../constants';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -71,6 +73,13 @@ const LandingPage: React.FC = () => {
   return (
     <main className="relative w-full z-10 font-sans text-sm md:text-base">
       
+      {/* 3D Background - Particle Effect */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+          <Canvas className="w-full h-full" dpr={[1, 2]} gl={{ antialias: true, alpha: true }}>
+              <Scene />
+          </Canvas>
+      </div>
+
       {/* HUD Header */}
       <div className="fixed top-0 left-0 w-full z-[60] bg-dark/90 backdrop-blur-xl border-b border-white/5 px-6 py-2 flex justify-between items-center text-[9px] md:text-[11px] uppercase tracking-[0.4em] text-gray-500 font-mono">
         <span className="flex items-center gap-3 text-alert">

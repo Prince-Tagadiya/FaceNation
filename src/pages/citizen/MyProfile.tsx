@@ -42,10 +42,13 @@ const MyProfile: React.FC = () => {
                             <div className="relative group/avatar">
                                 <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-purple-500 rounded-3xl blur opacity-40 group-hover/avatar:opacity-60 transition-opacity"></div>
                                 <div className="relative w-32 h-32 rounded-3xl bg-black border-4 border-black overflow-hidden flex items-center justify-center shadow-2xl">
-                                    <div className="w-full h-full bg-gradient-to-tr from-gray-900 to-gray-800 flex items-center justify-center text-4xl font-black text-white/90">
-                                        {user?.name?.charAt(0)}
-                                    </div>
-                                    <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover/avatar:opacity-100 transition-opacity"></div>
+                                    {(user?.faceRef || user?.photoURL) ? (
+                                        <img src={user.faceRef || user.photoURL} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full bg-gradient-to-tr from-gray-900 to-gray-800 flex items-center justify-center text-4xl font-black text-white/90">
+                                            {user?.name?.charAt(0)}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 
