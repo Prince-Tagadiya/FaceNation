@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Activity, Radio, Map, MessageSquare, Clock, AlertTriangle, CheckCircle, Bell } from 'lucide-react';
+import { Activity, Radio, Map, MessageSquare, Clock, AlertTriangle, CheckCircle, Bell, FileText } from 'lucide-react';
 import { getFirestore, collection, query, orderBy, onSnapshot, doc, updateDoc, Timestamp } from 'firebase/firestore';
 import { app } from '../lib/firebase';
 import LiveFeed from '../components/LiveFeed';
 import AlertView from '../components/AlertView';
 import LiveAlerts from '../components/LiveAlerts';
 import GeoMap from '../components/GeoMap';
+import CaseRegistry from '../components/CaseRegistry';
 
 interface RequestItem {
     id: string;
@@ -26,6 +27,7 @@ const ControlDashboard: React.FC = () => {
     const [showLiveFeed, setShowLiveFeed] = useState(false);
     const [showAlerts, setShowAlerts] = useState(false);
     const [showGeoMap, setShowGeoMap] = useState(false);
+    const [showCaseRegistry, setShowCaseRegistry] = useState(false);
     const [focusedAlertId, setFocusedAlertId] = useState<string | null>(null);
 
     // Fetch Requests Logic
@@ -93,6 +95,10 @@ const ControlDashboard: React.FC = () => {
                 </div>
             )}
 
+            {showCaseRegistry && (
+                <CaseRegistry onClose={() => setShowCaseRegistry(false)} />
+            )}
+
             <header className="flex justify-between items-center mb-10 border-b border-white/10 pb-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-widest text-[#00ccff]">CONTROL ROOM</h1>
@@ -112,7 +118,7 @@ const ControlDashboard: React.FC = () => {
                 </div>
             </header>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
                 <div
                     onClick={() => setShowLiveFeed(true)}
                     className="bg-white/5 p-6 rounded-lg border border-white/10 hover:border-[#00ccff]/50 transition-all cursor-pointer group"
@@ -136,6 +142,14 @@ const ControlDashboard: React.FC = () => {
                     <AlertTriangle className="w-8 h-8 text-red-500 mb-4 group-hover:scale-110 transition-transform" />
                     <h3 className="text-lg font-bold mb-2">Active Alerts</h3>
                     <p className="text-xs text-gray-400">Review and acknowledge system notifications.</p>
+                </div>
+                <div
+                    onClick={() => setShowCaseRegistry(true)}
+                    className="bg-white/5 p-6 rounded-lg border border-white/10 hover:border-[#00ccff]/50 transition-all cursor-pointer group"
+                >
+                    <FileText className="w-8 h-8 text-purple-500 mb-4 group-hover:scale-110 transition-transform" />
+                    <h3 className="text-lg font-bold mb-2">Case Registry</h3>
+                    <p className="text-xs text-gray-400">Browse all citizen cases and records.</p>
                 </div>
             </div>
 
