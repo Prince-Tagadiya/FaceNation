@@ -11,6 +11,7 @@ interface MatchResult {
     citizenEmail: string;
     confidence: number;
     distance: number;
+    faceRef: string;
 }
 
 const FaceScannerDemo: React.FC = () => {
@@ -188,7 +189,8 @@ const FaceScannerDemo: React.FC = () => {
                             citizenName: citizenData.name,
                             citizenEmail: citizenData.email,
                             distance: distance,
-                            confidence: Math.round((1 - distance) * 100)
+                            confidence: Math.round((1 - distance) * 100),
+                            faceRef: faceRef
                         };
                     }
                 } catch (imgError) {
@@ -370,6 +372,21 @@ const FaceScannerDemo: React.FC = () => {
                                 <div>
                                     <h4 className="text-xl font-bold text-red-500">POSITIVE MATCH</h4>
                                     <p className="text-xs text-red-400">Citizen identified in database</p>
+                                </div>
+                            </div>
+
+                            {/* Display Matched Reference Image */}
+                            <div className="mb-4 flex justify-center">
+                                <div className="relative group">
+                                    <img 
+                                        src={matchResult.faceRef ? `${matchResult.faceRef}?t=${Date.now()}` : ''}
+                                        alt="Matched Record" 
+                                        className="w-32 h-32 rounded-lg object-cover border-2 border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.3)]"
+                                    />
+                                    <div className="absolute inset-0 border-2 border-red-500 rounded-lg animate-pulse pointer-events-none"></div>
+                                    <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[10px] text-center py-1 rounded-b-lg">
+                                        DATABASE RECORD
+                                    </div>
                                 </div>
                             </div>
 
