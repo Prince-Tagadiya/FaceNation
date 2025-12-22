@@ -21,14 +21,14 @@ interface MapPoint {
     label: string;
 }
 
-// Center around London for demo
-const CENTER_LAT = 51.505;
-const CENTER_LNG = -0.09;
+// Center around Kodinar, Gujarat, India
+const CENTER_LAT = 20.792;
+const CENTER_LNG = 70.702;
 
-// Static cameras for ambience
+// Static cameras for ambience around Kodinar
 const STATIC_CAMERAS: MapPoint[] = [
-    { id: 'c1', lat: 51.515, lng: -0.09, type: 'camera', status: 'active', label: 'Cam-01 (Main St)' },
-    { id: 'c2', lat: 51.495, lng: -0.12, type: 'camera', status: 'warning', label: 'Cam-04 (Park)' },
+    { id: 'c1', lat: 20.7940, lng: 70.7040, type: 'camera', status: 'active', label: 'Cam-01 (Main Bazaar)' },
+    { id: 'c2', lat: 20.7900, lng: 70.6980, type: 'camera', status: 'warning', label: 'Cam-04 (Sugar Factory Rd)' },
 ];
 
 // Helper to handle map movement
@@ -131,7 +131,7 @@ const GeoMap: React.FC<GeoMockProps> = ({ onClose, initialFocusId, alerts }) => 
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold tracking-widest text-[#00ccff]">GEO-SPATIAL TRACKING</h1>
-                        <p className="text-xs text-gray-500 font-mono">SECTOR 7 // REAL-TIME UNIT DEPLOYMENT</p>
+                        <p className="text-xs text-gray-500 font-mono">SECTOR: KODINAR, GUJARAT // REAL-TIME DEPLOYMENT</p>
                     </div>
                 </div>
                 <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors border border-white/10">
@@ -177,7 +177,7 @@ const GeoMap: React.FC<GeoMockProps> = ({ onClose, initialFocusId, alerts }) => 
                 <div className="flex-1 relative bg-[#111] overflow-hidden">
                     <MapContainer
                         center={[CENTER_LAT, CENTER_LNG]}
-                        zoom={13}
+                        zoom={15}
                         style={{ height: '100%', width: '100%', background: '#050505' }}
                         zoomControl={false}
                     >
