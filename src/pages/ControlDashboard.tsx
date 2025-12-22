@@ -29,6 +29,7 @@ const ControlDashboard: React.FC = () => {
     const [showGeoMap, setShowGeoMap] = useState(false);
     const [showCaseRegistry, setShowCaseRegistry] = useState(false);
     const [focusedAlertId, setFocusedAlertId] = useState<string | null>(null);
+    const [filterStatus, setFilterStatus] = useState<'All' | 'Pending' | 'Reviewed' | 'Resolved'>('All');
 
     // Fetch Requests Logic
     useEffect(() => {
@@ -58,6 +59,8 @@ const ControlDashboard: React.FC = () => {
         setFocusedAlertId(alertId);
         setShowGeoMap(true);
     };
+
+    const filteredRequests = requests.filter(req => filterStatus === 'All' || req.status === filterStatus);
 
     return (
         <div className="min-h-screen bg-[#050505] text-white p-6 font-mono relative">
@@ -154,21 +157,37 @@ const ControlDashboard: React.FC = () => {
             </div>
 
             <div className="border-t border-white/10 pt-8">
-                <div className="flex items-center gap-3 mb-6">
-                    <MessageSquare className="text-[#00ccff]" />
-                    <h2 className="text-xl font-bold tracking-tight">Incoming Citizen Inquiries</h2>
-                    <span className="px-2 py-0.5 bg-[#00ccff]/20 text-[#00ccff] text-[10px] rounded-full animate-pulse">
-                        LIVE LINK
-                    </span>
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                        <MessageSquare className="text-[#00ccff]" />
+                        <h2 className="text-xl font-bold tracking-tight">Incoming Citizen Inquiries</h2>
+                        <span className="px-2 py-0.5 bg-[#00ccff]/20 text-[#00ccff] text-[10px] rounded-full animate-pulse">
+                            LIVE LINK
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        {['All', 'Pending', 'Reviewed', 'Resolved'].map(status => (
+                            <button
+                                key={status}
+                                onClick={() => setFilterStatus(status as any)}
+                                className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider rounded border transition-all ${filterStatus === status
+                                        ? 'bg-[#00ccff]/10 text-[#00ccff] border-[#00ccff]/50 shadow-[0_0_10px_rgba(0,204,255,0.2)]'
+                                        : 'bg-white/5 text-gray-500 border-transparent hover:text-gray-300 hover:bg-white/10'
+                                    }`}
+                            >
+                                {status}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4">
-                    {requests.length === 0 ? (
+                    {filteredRequests.length === 0 ? (
                         <div className="p-8 text-center border border-dashed border-white/10 rounded-xl text-gray-500 text-xs text-gray-400">
-                            NO PENDING TRANSMISSIONS
+                            NO {filterStatus !== 'All' ? filterStatus.toUpperCase() : ''} TRANSMISSIONS FOUND
                         </div>
                     ) : (
-                        requests.map((req) => (
+                        filteredRequests.map((req) => (
                             <div key={req.id} className="bg-white/5 border border-white/10 rounded-xl p-4 flex flex-col md:flex-row gap-6 relative overflow-hidden">
                                 {req.status === 'Pending' && (
                                     <div className="absolute left-0 top-0 bottom-0 w-1 bg-yellow-500" />
