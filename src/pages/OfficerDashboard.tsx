@@ -15,7 +15,7 @@ const OfficerDashboard: React.FC = () => {
     const renderContent = () => {
         switch (activeTab) {
             case 'dashboard':
-                return <DashboardOverview />;
+                return <DashboardOverview setActiveTab={setActiveTab} />;
             case 'search':
                 return <CitizenSearch />;
             case 'cases':

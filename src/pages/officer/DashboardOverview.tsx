@@ -5,7 +5,11 @@ import { useAuth } from '../../context/AuthContext';
 import { Case, Alert } from '../../types';
 import { FileText, Bell, Activity, Clock } from 'lucide-react';
 
-const DashboardOverview: React.FC = () => {
+interface DashboardOverviewProps {
+    setActiveTab: (tab: string) => void;
+}
+
+const DashboardOverview: React.FC<DashboardOverviewProps> = ({ setActiveTab }) => {
     const { user } = useAuth();
     const db = getFirestore(app);
     const [stats, setStats] = useState({
@@ -49,7 +53,7 @@ const DashboardOverview: React.FC = () => {
 
     return (
         <div className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="bg-[#111] border border-white/5 p-6 rounded-lg hover:border-blue-500/50 transition-colors">
                     <div className="flex justify-between items-start mb-4">
                         <div className="p-3 bg-blue-500/10 rounded-lg text-blue-500">
@@ -70,26 +74,6 @@ const DashboardOverview: React.FC = () => {
                     </div>
                     <div className="text-gray-400 text-sm">Pending Alerts</div>
                     <div className="text-[10px] text-gray-600 mt-1">TOTAL ALERTS: {stats.totalAlerts}</div>
-                </div>
-
-                <div className="bg-[#111] border border-white/5 p-6 rounded-lg">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-green-500/10 rounded-lg text-green-500">
-                            <Activity size={24} />
-                        </div>
-                        <span className="text-2xl font-bold text-white">98%</span>
-                    </div>
-                    <div className="text-gray-400 text-sm">System Uptime</div>
-                </div>
-
-                 <div className="bg-[#111] border border-white/5 p-6 rounded-lg">
-                    <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-purple-500/10 rounded-lg text-purple-500">
-                            <Clock size={24} />
-                        </div>
-                        <span className="text-xl font-bold text-white">SHIFT A</span>
-                    </div>
-                    <div className="text-gray-400 text-sm">Current Roster</div>
                 </div>
             </div>
 
@@ -114,14 +98,23 @@ const DashboardOverview: React.FC = () => {
                  <div className="bg-[#111] border border-white/5 rounded-lg p-6">
                      <h3 className="text-lg font-bold mb-6">QUICK ACTIONS</h3>
                      <div className="space-y-3">
-                         <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors">
+                         <button 
+                             onClick={() => setActiveTab('cases')}
+                             className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors"
+                         >
                             + Draft New Report
                          </button>
-                         <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors">
-                            Request Backup
+                         <button 
+                             onClick={() => setActiveTab('scan')}
+                             className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors"
+                         >
+                            Scan Citizen
                          </button>
-                         <button className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors">
-                            Access Archives
+                         <button 
+                             onClick={() => setActiveTab('search')}
+                             className="w-full p-3 bg-white/5 hover:bg-white/10 rounded text-left text-sm text-gray-300 transition-colors"
+                         >
+                            Search Citizens
                          </button>
                      </div>
                  </div>
