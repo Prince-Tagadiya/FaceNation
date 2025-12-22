@@ -9,6 +9,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import OfficerDashboard from './pages/OfficerDashboard';
 import ControlDashboard from './pages/ControlDashboard';
 import CitizenDashboard from './pages/CitizenDashboard';
+import ResetDatabase from './pages/ResetDatabase';
 import { UserRole } from './types';
 
 // Protected Route Component with Role Check
@@ -41,6 +42,12 @@ const AppRoutes = () => {
             <Route path="/admin" element={
                 <ProtectedRoute allowedRoles={['System Admin']}>
                     <AdminDashboard />
+                </ProtectedRoute>
+            } />
+
+            <Route path="/reset" element={
+                <ProtectedRoute allowedRoles={['System Admin']}>
+                    <ResetDatabase />
                 </ProtectedRoute>
             } />
             

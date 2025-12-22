@@ -33,4 +33,5 @@ export interface UserData {
   active: boolean;
   createdAt: string;
   createdBy?: string; // UID of the admin who created this user
+  tempPassword?: string;
 }

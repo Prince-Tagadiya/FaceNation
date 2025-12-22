@@ -1,14 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
-import { getFirestore, doc, setDoc, serverTimestamp, collection, onSnapshot, query, orderBy, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, deleteDoc, serverTimestamp, collection, onSnapshot, query, orderBy, getDocs } from 'firebase/firestore';
 import { initializeApp, deleteApp, getApp, getApps } from 'firebase/app';
 import { app, firebaseConfig } from '../lib/firebase';
 import { UserRole, UserData } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, UserPlus, ShieldAlert, Users, CheckCircle, XCircle } from 'lucide-react';
+import { Loader2, UserPlus, ShieldAlert, Users, CheckCircle, XCircle, Trash2, Eye, EyeOff } from 'lucide-react';
 
 const AdminDashboard: React.FC = () => {
     const { user, logout } = useAuth();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [name, setName] = useState('');
@@ -16,24 +18,28 @@ const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
     const [usersList, setUsersList] = useState<UserData[]>([]);
+    const [showPassword, setShowPassword] = useState<{[key: string]: boolean}>({});
 
     useEffect(() => {
         const db = getFirestore(app);
-        // Real-time listener for users list
         const q = query(collection(db, 'users'));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             const users: UserData[] = [];
             snapshot.forEach((doc) => {
-                const data = doc.data();
-                users.push({
-                    uid: doc.id,
-                    email: data.email,
-                    role: data.role,
-                    name: data.name,
-                    active: data.active,
-                    createdAt: data.createdAt?.toDate?.().toString() || new Date().toISOString(), // Handle standard timestamp
-                    createdBy: data.createdBy
-                });
+                const data = doc.data() as UserData;
+                // Filter out System Admins from the list
+                if (data.role !== 'System Admin') {
+                    users.push({
+                        uid: doc.id,
+                        email: data.email,
+                        role: data.role,
+                        name: data.name,
+                        active: data.active,
+                        createdAt: (data.createdAt as any)?.toDate?.().toString() ||  String(data.createdAt) || new Date().toISOString(),
+                        createdBy: data.createdBy,
+                        tempPassword: data.tempPassword
+                    });
+                }
             });
             setUsersList(users);
         });
@@ -46,11 +52,10 @@ const AdminDashboard: React.FC = () => {
         setLoading(true);
         setMessage('');
 
-        // Use a secondary app to avoid logging out the admin
         const secondaryAppName = "SecondaryApp-" + new Date().getTime();
         const secondaryApp = initializeApp(firebaseConfig, secondaryAppName);
         const secondaryAuth = getAuth(secondaryApp);
-        const db = getFirestore(app); // Write to main DB
+        const db = getFirestore(app);
 
         try {
              const userCredential = await createUserWithEmailAndPassword(secondaryAuth, email, password);
@@ -61,6 +66,7 @@ const AdminDashboard: React.FC = () => {
                  email,
                  role,
                  active: true,
+                 tempPassword: password, // Storing temp password for admin visibility (Security Note: MVP Only)
                  createdAt: serverTimestamp(),
                  createdBy: user?.uid
              });
@@ -69,17 +75,35 @@ const AdminDashboard: React.FC = () => {
              setName('');
              setEmail('');
              setPassword('');
-             // Clean up secondary app
              await deleteApp(secondaryApp);
 
         } catch (err: any) {
              console.error(err);
              setMessage(`Error: ${err.message}`);
-             // Ensure cleanup on error
              try { await deleteApp(secondaryApp); } catch(e) {}
         } finally {
              setLoading(false);
         }
+    };
+
+    const handleDeleteUser = async (uid: string, name: string) => {
+        if (!window.confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) return;
+
+        try {
+            const db = getFirestore(app);
+            await deleteDoc(doc(db, 'users', uid));
+            // Note: Auth user remains but they can't login due to AuthContext checks
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            alert("Failed to delete user record.");
+        }
+    };
+
+    const togglePasswordVisibility = (uid: string) => {
+        setShowPassword(prev => ({
+            ...prev,
+            [uid]: !prev[uid]
+        }));
     };
 
     return (
@@ -89,9 +113,14 @@ const AdminDashboard: React.FC = () => {
                     <h1 className="text-3xl font-bold text-red-500 tracking-widest">SYSTEM ADMIN</h1>
                     <p className="text-gray-500 text-sm mt-1">COMMAND CENTER // {user?.name.toUpperCase()}</p>
                 </div>
-                <button onClick={logout} className="bg-white/10 px-6 py-2 rounded hover:bg-white/20 transition-all text-sm">
-                    TERMINATE SESSION
-                </button>
+                <div className="flex gap-3">
+                    <button onClick={() => navigate('/reset')} className="bg-red-900/20 text-red-500 border border-red-500/30 px-4 py-2 rounded hover:bg-red-900/40 transition-all text-sm flex items-center gap-2">
+                         <ShieldAlert size={14} /> SYSTEM WIPE
+                    </button>
+                    <button onClick={logout} className="bg-white/10 px-6 py-2 rounded hover:bg-white/20 transition-all text-sm">
+                        TERMINATE SESSION
+                    </button>
+                </div>
             </header>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
@@ -135,7 +164,6 @@ const AdminDashboard: React.FC = () => {
                                     <option value="Investigating Officer">Investigating Officer</option>
                                     <option value="Control Room Operator">Control Room Operator</option>
                                     <option value="Citizen">Citizen</option>
-                                    <option value="System Admin">System Admin</option>
                                 </select>
                             </div>
                             <div>
@@ -171,7 +199,8 @@ const AdminDashboard: React.FC = () => {
                                 <tr>
                                     <th className="p-4">Name / Email</th>
                                     <th className="p-4">Role</th>
-                                    <th className="p-4 text-center">Status</th>
+                                    <th className="p-4">Attributes</th>
+                                    <th className="p-4 text-right">Action</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -183,7 +212,6 @@ const AdminDashboard: React.FC = () => {
                                         </td>
                                         <td className="p-4">
                                             <span className={`px-2 py-1 rounded text-[10px] uppercase border ${
-                                                u.role === 'System Admin' ? 'border-red-500/50 text-red-500' :
                                                 u.role === 'Investigating Officer' ? 'border-green-500/50 text-green-500' :
                                                 u.role === 'Control Room Operator' ? 'border-blue-500/50 text-blue-500' :
                                                 'border-gray-500 text-gray-400'
@@ -191,17 +219,37 @@ const AdminDashboard: React.FC = () => {
                                                 {u.role}
                                             </span>
                                         </td>
-                                        <td className="p-4 text-center">
-                                            {u.active ? 
-                                                <CheckCircle className="w-4 h-4 text-green-500 mx-auto" /> : 
-                                                <XCircle className="w-4 h-4 text-red-500 mx-auto" />
-                                            }
+                                        <td className="p-4 text-xs space-y-1">
+                                            <div className="flex items-center gap-2">
+                                                Status: 
+                                                {u.active ? <span className="text-green-500">Active</span> : <span className="text-red-500">Inactive</span>}
+                                            </div>
+                                            {u.tempPassword && (
+                                                <div className="flex items-center gap-2">
+                                                    Pass: 
+                                                    <span className="font-mono bg-white/10 px-1 rounded">
+                                                        {showPassword[u.uid] ? u.tempPassword : '••••••'}
+                                                    </span>
+                                                    <button onClick={() => togglePasswordVisibility(u.uid)} className="hover:text-white text-gray-500">
+                                                        {showPassword[u.uid] ? <EyeOff size={12}/> : <Eye size={12}/>}
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </td>
+                                        <td className="p-4 text-right">
+                                            <button 
+                                                onClick={() => handleDeleteUser(u.uid, u.name)}
+                                                className="text-red-500 hover:bg-red-500/10 p-2 rounded transition-colors"
+                                                title="Delete User"
+                                            >
+                                                <Trash2 size={16} />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
                                 {usersList.length === 0 && (
                                     <tr>
-                                        <td colSpan={3} className="p-8 text-center text-gray-500">
+                                        <td colSpan={4} className="p-8 text-center text-gray-500">
                                             No personnel records found.
                                         </td>
                                     </tr>
