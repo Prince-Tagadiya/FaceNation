@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import gsap from 'gsap';
-import { MagneticProps } from '../types';
+import { MagneticProps } from '../../types';
 
 const Magnetic: React.FC<MagneticProps> = ({ children, strength = 0.5 }) => {
   const ref = useRef<HTMLDivElement>(null);

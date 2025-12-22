@@ -35,3 +35,36 @@ export interface UserData {
   createdBy?: string; // UID of the admin who created this user
   tempPassword?: string;
 }
+
+export type CaseType = 'Missing Person' | 'High-Value Suspect' | 'Criminal Record';
+export type CaseStatus = 'Active' | 'Closed';
+
+export interface Case {
+    uid: string;
+    type: CaseType;
+    status: CaseStatus;
+    subjectName: string;
+    subjectId?: string; // Link to a Citizen User UID
+    assignedOfficerId: string;
+    description: string;
+    createdAt: string; // ISO String or Firestore Timestamp converted
+    lastUpdated: string;
+}
+
+export type AlertStatus = 'New' | 'Acknowledged';
+
+export interface Alert {
+    uid: string;
+    caseId: string;
+    officerId: string;
+    confidence: number;
+    status: AlertStatus;
+    timestamp: string;
+}
+
+export interface ActivityLog {
+    id: string;
+    action: string;
+    timestamp: string;
+    details?: string;
+}
