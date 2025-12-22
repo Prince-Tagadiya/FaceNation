@@ -86,3 +86,17 @@ export interface SystemSettings {
   updatedAt: string;
   updatedBy: string;
 }
+
+export type AlertSeverity = 'critical' | 'high' | 'medium' | 'low';
+
+export interface DashboardAlert {
+  id: string;
+  timestamp: string;
+  type: string;
+  location: string;
+  severity: AlertSeverity;
+  message: string;
+  status: 'active' | 'acknowledged' | 'assigned' | 'resolved';
+  imageUrl?: string;
+  assignedTo?: string;
+}
