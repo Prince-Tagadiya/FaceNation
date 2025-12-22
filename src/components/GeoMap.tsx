@@ -3,10 +3,13 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { X, Navigation, Radio, Target } from 'lucide-react';
+import { MOCK_OFFICERS } from '../constants';
+import { DashboardAlert } from '../types';
 
 interface GeoMockProps {
     onClose: () => void;
     initialFocusId?: string | null;
+    alerts: DashboardAlert[];
 }
 
 interface MapPoint {
@@ -22,17 +25,10 @@ interface MapPoint {
 const CENTER_LAT = 51.505;
 const CENTER_LNG = -0.09;
 
-const MOCK_POINTS: MapPoint[] = [
-    { id: 'u1', lat: 51.505, lng: -0.09, type: 'unit', status: 'active', label: 'Unit Alpha' },
-    { id: 'u2', lat: 51.51, lng: -0.1, type: 'unit', status: 'idle', label: 'Unit Bravo' },
-    { id: 'u3', lat: 51.49, lng: -0.08, type: 'unit', status: 'active', label: 'Unit Charlie' },
-    { id: 'i1', lat: 51.508, lng: -0.11, type: 'incident', status: 'critical', label: 'Suspicious Activity' },
+// Static cameras for ambience
+const STATIC_CAMERAS: MapPoint[] = [
     { id: 'c1', lat: 51.515, lng: -0.09, type: 'camera', status: 'active', label: 'Cam-01 (Main St)' },
     { id: 'c2', lat: 51.495, lng: -0.12, type: 'camera', status: 'warning', label: 'Cam-04 (Park)' },
-    // Mock Incident Types matching those in AlertView
-    { id: '1', lat: 51.503, lng: -0.095, type: 'incident', status: 'critical', label: 'Face Match: Subject 89' },
-    { id: '2', lat: 51.502, lng: -0.085, type: 'incident', status: 'active', label: 'Perimeter Breach' },
-    { id: '5', lat: 51.509, lng: -0.099, type: 'incident', status: 'critical', label: 'Face Match: Missing Person' },
 ];
 
 // Helper to handle map movement
@@ -65,29 +61,58 @@ const createCustomIcon = (type: string, status: string) => {
     });
 };
 
-const GeoMap: React.FC<GeoMockProps> = ({ onClose, initialFocusId }) => {
-    const [points, setPoints] = useState<MapPoint[]>(MOCK_POINTS);
+const GeoMap: React.FC<GeoMockProps> = ({ onClose, initialFocusId, alerts }) => {
+    const [points, setPoints] = useState<MapPoint[]>([]);
     const [selectedPoint, setSelectedPoint] = useState<MapPoint | null>(null);
+
+    // Sync points with alerts and constants
+    useEffect(() => {
+        const incidentPoints: MapPoint[] = alerts
+            .filter(a => a.lat && a.lng && a.status !== 'resolved') // Only show active/assigned alerts with location
+            .map(a => ({
+                id: a.id,
+                lat: a.lat!,
+                lng: a.lng!,
+                type: 'incident',
+                status: a.severity === 'critical' ? 'critical' : 'active',
+                label: `${a.type}: ${a.location}`
+            }));
+
+        const officerPoints: MapPoint[] = MOCK_OFFICERS.map(o => {
+            // Check if officer is assigned to any active alert
+            const assignedAlert = alerts.find(a => a.assignedTo === o.name && a.status !== 'resolved');
+            return {
+                id: o.id,
+                lat: o.lat,
+                lng: o.lng,
+                type: 'unit',
+                status: assignedAlert ? 'active' : 'idle',
+                label: o.name
+            };
+        });
+
+        setPoints([...incidentPoints, ...officerPoints, ...STATIC_CAMERAS]);
+    }, [alerts]);
 
     // Initial Focus Effect
     useEffect(() => {
-        if (initialFocusId) {
+        if (initialFocusId && points.length > 0) {
             const target = points.find(p => p.id === initialFocusId);
             if (target) {
                 setSelectedPoint(target);
             }
         }
-    }, [initialFocusId]);
+    }, [initialFocusId, points]);
 
-    // Simulate movement for units
+    // Simulate movement for active units
     useEffect(() => {
         const interval = setInterval(() => {
             setPoints(prev => prev.map(p => {
                 if (p.type === 'unit' && p.status === 'active') {
                     return {
                         ...p,
-                        lat: p.lat + (Math.random() - 0.5) * 0.001,
-                        lng: p.lng + (Math.random() - 0.5) * 0.001
+                        lat: p.lat + (Math.random() - 0.5) * 0.0005,
+                        lng: p.lng + (Math.random() - 0.5) * 0.0005
                     };
                 }
                 return p;

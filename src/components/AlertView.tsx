@@ -2,21 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { DashboardAlert, AlertSeverity } from '../types';
 import { X, AlertTriangle, CheckCircle, Clock, MapPin, Search, Bell } from 'lucide-react';
 
+import { MOCK_OFFICERS } from '../constants';
+
 interface AlertViewProps {
     onClose: () => void;
     onLocate: (alertId: string) => void;
+    alerts: DashboardAlert[];
+    onUpdateAlerts: React.Dispatch<React.SetStateAction<DashboardAlert[]>>;
 }
 
-const MOCK_ALERTS: DashboardAlert[] = [
-    { id: '1', timestamp: new Date().toISOString(), type: 'Face Match', location: 'Central Station', severity: 'critical', message: 'Target "Subject 89" identified at Platform 3.', status: 'active', imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?px=250' },
-    { id: '2', timestamp: new Date(Date.now() - 1000 * 60 * 5).toISOString(), type: 'Perimeter Breach', location: 'Sector 4', severity: 'high', message: 'Unauthorized entry detected at North Gate.', status: 'active' },
-    { id: '3', timestamp: new Date(Date.now() - 1000 * 60 * 15).toISOString(), type: 'Loitering', location: 'Shopping Mall Entrance', severity: 'medium', message: 'Group detected loitering > 10 mins.', status: 'acknowledged' },
-    { id: '4', timestamp: new Date(Date.now() - 1000 * 60 * 30).toISOString(), type: 'Object Left Behind', location: 'Airport Terminal 1', severity: 'low', message: 'Unattended bag detected near check-in.', status: 'resolved' },
-    { id: '5', timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(), type: 'Face Match', location: 'City Park', severity: 'critical', message: 'Match 98% with "Missing Person" DB.', status: 'active', imageUrl: 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?px=250' },
-];
-
-const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate }) => {
-    const [alerts, setAlerts] = useState<DashboardAlert[]>(MOCK_ALERTS);
+const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate, alerts, onUpdateAlerts }) => {
     const [selectedAlert, setSelectedAlert] = useState<DashboardAlert | null>(null);
     const [filter, setFilter] = useState<AlertSeverity | 'all'>('all');
     const [showActiveOnly, setShowActiveOnly] = useState(false);
@@ -36,13 +31,6 @@ const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate }) => {
 
     const [selectedOfficer, setSelectedOfficer] = useState('');
     const [actionMessage, setActionMessage] = useState<string | null>(null);
-
-    const MOCK_OFFICERS = [
-        { id: 'off1', name: 'Officer John Doe' },
-        { id: 'off2', name: 'Officer Jane Smith' },
-        { id: 'off3', name: 'Officer Mike Ross' },
-        { id: 'off4', name: 'Officer Sarah Connor' },
-    ];
 
     const isOfficerBusy = (officerName: string) => {
         return alerts.some(a =>
@@ -67,12 +55,12 @@ const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate }) => {
     };
 
     const handleAcknowledge = (id: string) => {
-        setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'acknowledged' } : a));
+        onUpdateAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'acknowledged' } : a));
         showActionFeedback("Alert Status: ACKNOWLEDGED");
     };
 
     const handleResolve = (id: string) => {
-        setAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'resolved' } : a));
+        onUpdateAlerts(prev => prev.map(a => a.id === id ? { ...a, status: 'resolved' } : a));
         showActionFeedback("Alert Status: RESOLVED");
     };
 
@@ -85,7 +73,7 @@ const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate }) => {
             return;
         }
 
-        setAlerts(prev => prev.map(a => a.id === id ? {
+        onUpdateAlerts(prev => prev.map(a => a.id === id ? {
             ...a,
             status: 'assigned',
             assignedTo: officerName
@@ -273,13 +261,47 @@ const AlertView: React.FC<AlertViewProps> = ({ onClose, onLocate }) => {
                                     <label className="text-gray-500 text-[10px] uppercase tracking-widest block mb-2">Assignment Status</label>
 
                                     {selectedAlert.assignedTo ? (
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-xs">
-                                                {selectedAlert.assignedTo.split(' ').map(n => n[0]).join('')}
+                                        <div className="flex flex-col gap-3">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 font-bold text-xs">
+                                                    {selectedAlert.assignedTo.split(' ').map(n => n[0]).join('')}
+                                                </div>
+                                                <div>
+                                                    <div className="text-white text-sm font-bold">{selectedAlert.assignedTo}</div>
+                                                    <div className="text-xs text-blue-400">Response Unit Dispatched</div>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <div className="text-white text-sm font-bold">{selectedAlert.assignedTo}</div>
-                                                <div className="text-xs text-blue-400">Response Unit Dispatched</div>
+
+                                            {/* Live Tracking Extension */}
+                                            <div className="mt-2 bg-black/40 p-3 rounded border border-blue-500/30">
+                                                <div className="flex justify-between items-center mb-2">
+                                                    <h4 className="text-[10px] uppercase text-blue-400 font-bold tracking-widest flex items-center gap-2">
+                                                        <span className="relative flex h-2 w-2">
+                                                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                                                            <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                                                        </span>
+                                                        LIVE TRACKING ACTIVE
+                                                    </h4>
+                                                </div>
+                                                <div className="space-y-2 text-xs font-mono">
+                                                    <div className="flex justify-between border-b border-white/5 pb-1">
+                                                        <span className="text-gray-500">TARGET LOC:</span>
+                                                        <span className="text-white">{selectedAlert.lat?.toFixed(4)}, {selectedAlert.lng?.toFixed(4)}</span>
+                                                    </div>
+                                                    <div className="flex justify-between border-b border-white/5 pb-1">
+                                                        <span className="text-gray-500">OFFICER LOC:</span>
+                                                        <span className="text-blue-300">
+                                                            {(() => {
+                                                                const officer = MOCK_OFFICERS.find(o => o.name === selectedAlert.assignedTo);
+                                                                return officer ? `${officer.lat.toFixed(4)}, ${officer.lng.toFixed(4)}` : 'SIGNAL LOST';
+                                                            })()}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex justify-between pt-1">
+                                                        <span className="text-gray-500">ETA:</span>
+                                                        <span className="text-green-400 font-bold">~2 MINS</span>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     ) : (

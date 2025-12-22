@@ -8,6 +8,8 @@ import AlertView from '../components/AlertView';
 import LiveAlerts from '../components/LiveAlerts';
 import GeoMap from '../components/GeoMap';
 import CaseRegistry from '../components/CaseRegistry';
+import { MOCK_ALERTS } from '../constants';
+import { DashboardAlert } from '../types';
 
 interface RequestItem {
     id: string;
@@ -30,6 +32,7 @@ const ControlDashboard: React.FC = () => {
     const [showCaseRegistry, setShowCaseRegistry] = useState(false);
     const [focusedAlertId, setFocusedAlertId] = useState<string | null>(null);
     const [filterStatus, setFilterStatus] = useState<'All' | 'Pending' | 'Reviewed' | 'Resolved'>('All');
+    const [dashboardAlerts, setDashboardAlerts] = useState<DashboardAlert[]>(MOCK_ALERTS);
 
     // Fetch Requests Logic
     useEffect(() => {
@@ -80,6 +83,8 @@ const ControlDashboard: React.FC = () => {
                 <AlertView
                     onClose={() => setShowAlerts(false)}
                     onLocate={handleLocateAlert}
+                    alerts={dashboardAlerts}
+                    onUpdateAlerts={setDashboardAlerts}
                 />
             )}
 
@@ -93,6 +98,7 @@ const ControlDashboard: React.FC = () => {
                                 setFocusedAlertId(null);
                             }}
                             initialFocusId={focusedAlertId}
+                            alerts={dashboardAlerts}
                         />
                     </React.Suspense>
                 </div>
@@ -171,8 +177,8 @@ const ControlDashboard: React.FC = () => {
                                 key={status}
                                 onClick={() => setFilterStatus(status as any)}
                                 className={`px-3 py-1 text-[10px] uppercase font-bold tracking-wider rounded border transition-all ${filterStatus === status
-                                        ? 'bg-[#00ccff]/10 text-[#00ccff] border-[#00ccff]/50 shadow-[0_0_10px_rgba(0,204,255,0.2)]'
-                                        : 'bg-white/5 text-gray-500 border-transparent hover:text-gray-300 hover:bg-white/10'
+                                    ? 'bg-[#00ccff]/10 text-[#00ccff] border-[#00ccff]/50 shadow-[0_0_10px_rgba(0,204,255,0.2)]'
+                                    : 'bg-white/5 text-gray-500 border-transparent hover:text-gray-300 hover:bg-white/10'
                                     }`}
                             >
                                 {status}

@@ -99,4 +99,6 @@ export interface DashboardAlert {
   status: 'active' | 'acknowledged' | 'assigned' | 'resolved';
   imageUrl?: string;
   assignedTo?: string;
+  lat?: number;
+  lng?: number;
 }
