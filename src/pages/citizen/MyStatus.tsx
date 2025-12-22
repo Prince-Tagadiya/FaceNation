@@ -91,8 +91,8 @@ const MyStatus: React.FC = () => {
                         </div>
                         <span className="text-xs font-mono text-primary uppercase tracking-[0.2em] font-bold">Identity Protocol</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold text-white tracking-tight">My Status</h1>
-                    <p className="text-gray-400 mt-2 font-medium">Personal memos and government surveillance notifications.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">My Status</h1>
+                    <p className="text-gray-400 mt-2 font-medium text-sm md:text-base">Personal memos and government surveillance notifications.</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <div className="px-4 py-2 bg-white/5 backdrop-blur-md rounded-xl border border-white/10 flex items-center gap-3 group hover:border-primary/50 transition-all cursor-crosshair">
@@ -108,7 +108,7 @@ const MyStatus: React.FC = () => {
             {/* Case Status Section (Read-Only) */}
             <div className="relative group">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 to-purple-500/30 rounded-2xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
-                <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 overflow-hidden">
+                <div className="relative bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-6 md:p-8 overflow-hidden">
                     <div className="absolute top-0 right-0 p-8 text-white opacity-[0.03] pointer-events-none">
                         <Activity size={160} strokeWidth={1} />
                     </div>

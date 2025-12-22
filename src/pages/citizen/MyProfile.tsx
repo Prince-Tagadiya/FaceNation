@@ -15,7 +15,7 @@ const MyProfile: React.FC = () => {
                     </div>
                     <span className="text-xs font-mono text-primary uppercase tracking-[0.2em] font-bold">Dossier Access</span>
                 </div>
-                <h1 className="text-4xl font-extrabold text-white tracking-tight">System Identity</h1>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">System Identity</h1>
             </div>
 
             <div className="relative group">
@@ -37,8 +37,8 @@ const MyProfile: React.FC = () => {
                     </div>
 
                     {/* Profile Overlay */}
-                    <div className="px-10 pb-12 relative">
-                        <div className="flex flex-col md:flex-row md:items-end gap-8 -mt-16">
+                    <div className="px-6 md:px-10 pb-12 relative">
+                        <div className="flex flex-col md:flex-row md:items-end md:text-left text-center gap-8 -mt-16">
                             <div className="relative group/avatar">
                                 <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-purple-500 rounded-3xl blur opacity-40 group-hover/avatar:opacity-60 transition-opacity"></div>
                                 <div className="relative w-32 h-32 rounded-3xl bg-black border-4 border-black overflow-hidden flex items-center justify-center shadow-2xl">
@@ -50,8 +50,8 @@ const MyProfile: React.FC = () => {
                             </div>
 
                             <div className="flex-1 space-y-2 mb-2">
-                                <h2 className="text-4xl font-black text-white tracking-tighter">{user?.name}</h2>
-                                <div className="flex flex-wrap gap-3">
+                                <h2 className="text-3xl md:text-4xl font-black text-white tracking-tighter">{user?.name}</h2>
+                                <div className="flex flex-wrap gap-3 justify-center md:justify-start">
                                     <span className="text-[10px] font-mono text-primary font-bold uppercase tracking-widest bg-primary/10 px-2.5 py-1 rounded-lg border border-primary/20">
                                         {user?.role}
                                     </span>
@@ -66,8 +66,8 @@ const MyProfile: React.FC = () => {
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-12">
                             {/* Primary Intel */}
                             <div className="lg:col-span-2 space-y-8">
-                                <div className="p-1 bg-white/[0.02] border border-white/5 rounded-3xl">
-                                    <div className="bg-black/40 backdrop-blur-md rounded-[1.4rem] p-8 space-y-8">
+                                <div className="p-0.5 md:p-1 bg-white/[0.02] border border-white/5 rounded-3xl">
+                                    <div className="bg-black/40 backdrop-blur-md rounded-[1.4rem] p-6 md:p-8 space-y-8">
                                         <div className="flex items-center gap-3 mb-2">
                                             <div className="w-1.5 h-4 bg-primary rounded-full"></div>
                                             <h3 className="text-xs font-black uppercase tracking-[0.3em] text-gray-500">Core Biometrics</h3>

@@ -88,8 +88,8 @@ const CitizenDashboard: React.FC = () => {
                         </div>
                         <span className="text-xs font-mono text-primary uppercase tracking-[0.2em] font-bold">Registry Terminal</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold text-white tracking-tight">Citizen Dashboard</h1>
-                    <p className="text-gray-400 font-medium">Identity synchronization established. Welcome back, {user?.name?.split(' ')[0]}.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Citizen Dashboard</h1>
+                    <p className="text-gray-400 font-medium text-sm md:text-base">Identity synchronization established. Welcome back, {user?.name?.split(' ')[0]}.</p>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -111,7 +111,7 @@ const CitizenDashboard: React.FC = () => {
                 <div className="lg:col-span-2 relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/30 via-purple-500/20 to-primary/30 rounded-[2rem] blur opacity-10 group-hover:opacity-20 transition-opacity"></div>
 
-                    <div className="relative bg-[#080808]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 md:p-10 overflow-hidden min-h-[400px]">
+                    <div className="relative bg-[#080808]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-10 overflow-hidden min-h-[400px]">
                         {/* Background Decoration */}
                         <div className="absolute top-0 right-0 p-12 text-primary opacity-[0.03] pointer-events-none transition-transform duration-1000 group-hover:scale-110">
                             <Shield size={240} strokeWidth={0.5} />
@@ -137,10 +137,10 @@ const CitizenDashboard: React.FC = () => {
                                 <div className="space-y-4">
                                     <p className="text-[10px] uppercase text-gray-600 font-mono tracking-widest font-bold">Transparency Metric</p>
                                     <div className="flex items-baseline gap-2">
-                                        <span className={`text-7xl font-black tracking-tighter transition-colors duration-1000 ${getStatusColor(transparencyScore)}`}>
+                                        <span className={`text-5xl md:text-7xl font-black tracking-tighter transition-colors duration-1000 ${getStatusColor(transparencyScore)}`}>
                                             {transparencyScore}
                                         </span>
-                                        <span className="text-2xl font-mono text-gray-500 font-bold opacity-30">/100</span>
+                                        <span className="text-xl md:text-2xl font-mono text-gray-500 font-bold opacity-30">/100</span>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className={`px-3 py-1 rounded-full text-[10px] font-black border tracking-widest uppercase

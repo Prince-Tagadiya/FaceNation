@@ -83,8 +83,8 @@ const Requests: React.FC = () => {
                     </div>
                     <span className="text-xs font-mono text-primary uppercase tracking-[0.2em] font-bold">Communications Link</span>
                 </div>
-                <h1 className="text-4xl font-extrabold text-white tracking-tight">Inquiry Protocol</h1>
-                <p className="text-gray-400 font-medium">Official encrypted channel for government data synchronization and clarification.</p>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Inquiry Protocol</h1>
+                <p className="text-gray-400 font-medium text-sm md:text-base">Official encrypted channel for government data synchronization and clarification.</p>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
@@ -92,7 +92,7 @@ const Requests: React.FC = () => {
                 <div className="relative group">
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-[2rem] blur opacity-10 transition-opacity"></div>
 
-                    <div className="relative bg-[#080808]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-8 md:p-10">
+                    <div className="relative bg-[#080808]/80 backdrop-blur-2xl border border-white/10 rounded-[2rem] p-6 md:p-10">
                         {submitted ? (
                             <div className="py-12 text-center space-y-6">
                                 <div className="relative inline-block">

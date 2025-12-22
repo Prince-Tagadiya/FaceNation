@@ -82,8 +82,8 @@ const Cases: React.FC = () => {
                         </div>
                         <span className="text-xs font-mono text-orange-400 uppercase tracking-[0.2em] font-bold">Judicial Records</span>
                     </div>
-                    <h1 className="text-4xl font-extrabold text-white tracking-tight">My Cases</h1>
-                    <p className="text-gray-400 font-medium">Legal records, investigations, and judicial matters linked to your identity profile.</p>
+                    <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-tight">My Cases</h1>
+                    <p className="text-gray-400 font-medium text-sm md:text-base">Legal records, investigations, and judicial matters linked to your identity profile.</p>
                 </div>
 
                 <button
@@ -136,7 +136,7 @@ const Cases: React.FC = () => {
                             >
                                 <div className={`absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm bg-gradient-to-r ${c.status === 'Active' ? 'from-red-500/20 to-orange-500/20' : 'from-primary/20 to-purple-500/20'}`}></div>
 
-                                <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-6 md:p-8 overflow-hidden">
+                                <div className="relative bg-black/40 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 md:p-8 overflow-hidden">
                                     <div className="absolute top-0 right-0 p-8 text-white opacity-[0.02] pointer-events-none transition-transform duration-700 group-hover:scale-110">
                                         <FileText size={180} strokeWidth={1} />
                                     </div>
@@ -176,7 +176,7 @@ const Cases: React.FC = () => {
                                         </div>
 
                                         {/* Status Section */}
-                                        <div className="lg:w-40 flex flex-col justify-center items-end border-t lg:border-t-0 lg:border-l border-white/5 pt-6 lg:pt-0 lg:pl-8">
+                                        <div className="lg:w-40 flex flex-row lg:flex-col justify-between lg:justify-center items-center lg:items-end border-t lg:border-t-0 lg:border-l border-white/5 pt-5 lg:pt-0 lg:pl-8">
                                             <div className={`flex items-center gap-2 mb-2 px-4 py-2 rounded-2xl border transition-all duration-300
                                                 ${c.status === 'Active'
                                                     ? 'bg-red-500/10 text-red-500 border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.1)]'
