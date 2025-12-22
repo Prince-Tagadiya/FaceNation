@@ -20,6 +20,9 @@ const CitizenDashboard: React.FC = () => {
     const [recentCases, setRecentCases] = useState<CaseData[]>([]);
     const [loading, setLoading] = useState(true);
 
+    // Dynamic Score - default perfect score, reduces with open cases
+    const [transparencyScore, setTransparencyScore] = useState(100);
+
     useEffect(() => {
         if (!user) return;
 
@@ -32,12 +35,18 @@ const CitizenDashboard: React.FC = () => {
         );
 
         const unsubscribe = onSnapshot(q, (snapshot) => {
-            setCaseCount(snapshot.size);
-
             const fetchedCases = snapshot.docs.map(doc => ({
                 id: doc.id,
                 ...doc.data()
             })) as CaseData[];
+
+            // Count open cases for score calculation
+            const openCases = fetchedCases.filter(c => c.status === 'Open').length;
+            setCaseCount(openCases); // Only count active/open cases for the alert
+
+            // Calculate Score: 100 - (10 per open case)
+            const calculatedScore = Math.max(0, 100 - (openCases * 10));
+            setTransparencyScore(calculatedScore);
 
             // Sort by createdAt desc
             fetchedCases.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
@@ -48,6 +57,24 @@ const CitizenDashboard: React.FC = () => {
 
         return () => unsubscribe();
     }, [user]);
+
+    const getStatusText = (score: number) => {
+        if (score >= 90) return 'SECURE';
+        if (score >= 70) return 'MODERATE';
+        return 'AT RISK';
+    };
+
+    const getStatusColor = (score: number) => {
+        if (score >= 90) return 'text-primary';
+        if (score >= 70) return 'text-yellow-400';
+        return 'text-red-500';
+    };
+
+    const getBarColor = (score: number) => {
+        if (score >= 90) return 'bg-primary';
+        if (score >= 70) return 'bg-yellow-400';
+        return 'bg-red-500';
+    };
 
     return (
         <div className="space-y-8">
@@ -89,11 +116,14 @@ const CitizenDashboard: React.FC = () => {
                     <div className="grid grid-cols-2 gap-8 relative z-10">
                         <div>
                             <p className="text-xs uppercase text-gray-500 font-mono tracking-widest mb-1">Transparency Score</p>
-                            <p className="text-4xl font-bold text-white">98<span className="text-lg text-gray-500">/100</span></p>
+                            <p className="text-4xl font-bold text-white transition-all duration-500">
+                                {transparencyScore}
+                                <span className="text-lg text-gray-500">/100</span>
+                            </p>
                         </div>
                         <div>
                             <p className="text-xs uppercase text-gray-500 font-mono tracking-widest mb-1">Last Verification</p>
-                            <p className="text-xl font-mono text-white">2024-12-22</p>
+                            <p className="text-xl font-mono text-white">{new Date().toISOString().split('T')[0]}</p>
                             <p className="text-xs text-gray-500">Authorized by GovPortal</p>
                         </div>
                     </div>
@@ -101,9 +131,14 @@ const CitizenDashboard: React.FC = () => {
                     <div className="mt-8 pt-6 border-t border-white/10">
                         <div className="flex items-center gap-4">
                             <div className="flex-1 bg-white/5 h-2 rounded-full overflow-hidden">
-                                <div className="h-full bg-primary w-[98%] shadow-[0_0_10px_rgba(0,240,255,0.5)]"></div>
+                                <div
+                                    className={`h-full ${getBarColor(transparencyScore)} transition-all duration-1000 ease-out shadow-[0_0_10px_rgba(0,240,255,0.5)]`}
+                                    style={{ width: `${transparencyScore}%` }}
+                                ></div>
                             </div>
-                            <span className="text-xs font-mono text-primary">SECURE</span>
+                            <span className={`text-xs font-mono font-bold ${getStatusColor(transparencyScore)}`}>
+                                {getStatusText(transparencyScore)}
+                            </span>
                         </div>
                     </div>
                 </div>
