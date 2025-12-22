@@ -1,8 +1,10 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 @layer base {
+  :root {
+    --primary-rgb: 0, 240, 255;
+  }
+
   body {
     @apply bg-black text-white antialiased overflow-x-hidden;
   }
